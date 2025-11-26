@@ -6,6 +6,7 @@ interface AnalysisResult {
   imageUrl: string;
   topLabel: string;
   score: number;
+  candidates?: { label: string; score: number }[];
 }
 
 export function useAiVision() {
@@ -34,18 +35,18 @@ export function useAiVision() {
         setStatus('ready');
         setProgress(null);
       } else if (type === 'result') {
-        // result: [{ label: "Assorted Seeds", score: 0.95 }, ...]
+        // result: [{ label: "...", score: ... }, ...] (Top 3)
         if (Array.isArray(result) && result.length > 0) {
           const topMatch = result[0];
           
           setResults(prev => {
-            // id는 인덱스로 사용됨
             const newResults = [...prev];
             if (newResults[id]) {
               newResults[id] = {
-                ...newResults[id], // 이미 imageUrl은 있음
+                ...newResults[id],
                 topLabel: topMatch.label,
-                score: topMatch.score
+                score: topMatch.score,
+                candidates: result // 전체 Top 3 저장
               };
             }
             return newResults;

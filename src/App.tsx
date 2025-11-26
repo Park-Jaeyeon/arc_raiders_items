@@ -151,12 +151,16 @@ function App() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-neutral-300 truncate" title={res.topLabel}>
-                          {res.topLabel}
+                        <p className="text-xs font-bold text-amber-400 truncate" title={`1. ${res.topLabel}`}>
+                          {res.topLabel} <span className="text-[10px] text-neutral-500">({(res.score * 100).toFixed(0)}%)</span>
                         </p>
-                        <p className="text-[10px] text-neutral-500">
-                          {(res.score * 100).toFixed(0)}% confidence
-                        </p>
+                        
+                        {/* 2등, 3등 후보 표시 */}
+                        {res.candidates && res.candidates.slice(1, 3).map((cand, cIdx) => (
+                          <p key={cIdx} className="text-[10px] text-neutral-500 truncate pl-1 border-l border-neutral-700" title={`${cIdx + 2}. ${cand.label}`}>
+                            {cand.label} <span className="opacity-50">{(cand.score * 100).toFixed(0)}%</span>
+                          </p>
+                        ))}
                       </div>
                     </div>
                   ))}

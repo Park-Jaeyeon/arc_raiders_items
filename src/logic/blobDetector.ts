@@ -96,23 +96,39 @@ export async function getItemSlots(file: File, threshold: number = 100): Promise
         }
       }
 
-      // NMS (겹치는 박스 제거)
-      // 간단하게: 중심점이 다른 박스 안에 있으면 제거
+      // NMS (Non-Maximum Suppression) - 겹치는 박스 제거
+      // IoU (Intersection over Union) 방식으로 더 정확하게 필터링
       const uniqueBlobs: BoundingBox[] = [];
-      blobs.sort((a, b) => (b.width * b.height) - (a.width * a.height)); // 큰 것부터
+      
+      // 크기순 정렬 (큰 박스 우선)
+      blobs.sort((a, b) => (b.width * b.height) - (a.width * a.height));
 
       for (const b of blobs) {
-        let overlapped = false;
-        const cx = b.x + b.width / 2;
-        const cy = b.y + b.height / 2;
+        let shouldKeep = true;
+        const areaB = b.width * b.height;
 
         for (const u of uniqueBlobs) {
-            if (cx > u.x && cx < u.x + u.width && cy > u.y && cy < u.y + u.height) {
-                overlapped = true;
-                break;
+            // 교차 영역 계산
+            const x1 = Math.max(b.x, u.x);
+            const y1 = Math.max(b.y, u.y);
+            const x2 = Math.min(b.x + b.width, u.x + u.width);
+            const y2 = Math.min(b.y + b.height, u.y + u.height);
+
+            if (x1 < x2 && y1 < y2) {
+                const intersection = (x2 - x1) * (y2 - y1);
+                const areaU = u.width * u.height;
+                
+                // IoU 대신 "포함 비율"을 사용 (작은 박스가 큰 박스 안에 거의 들어가면 제거)
+                // 게임 아이콘은 겹쳐있지 않으므로, 조금이라도 겹치면 중복일 확률 높음
+                const overlapRatio = intersection / Math.min(areaB, areaU);
+
+                if (overlapRatio > 0.3) { // 30% 이상 겹치면 제거
+                    shouldKeep = false;
+                    break;
+                }
             }
         }
-        if (!overlapped) uniqueBlobs.push(b);
+        if (shouldKeep) uniqueBlobs.push(b);
       }
 
       // 상위 40개 제한 (성능)
