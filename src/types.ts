@@ -1,0 +1,28 @@
+export type Action = "KEEP" | "MAYBE" | "RECYCLE";
+
+export type RawItem = {
+  name: string;
+  qty: number;
+};
+
+export type ClassifiedItem = RawItem & {
+  action: Action;
+  reason: string;
+  category?: string; // e.g., "ammo", "material", "quest"
+};
+
+export type ItemMetadata = {
+  name: string;
+  category: "ammo" | "material" | "consumable" | "weapon" | "armor" | "misc";
+  usedForQuests?: boolean;
+  usedForWorkshop?: boolean;
+  usedForCrafting?: boolean;
+  usedForSpecialVendor?: boolean;
+  defaultKeepMin?: number; // 권장 최소 보유량
+  maxStack?: number;
+};
+
+export type OcrResult = {
+  rawText: string;
+  lines: string[];
+};
