@@ -131,8 +131,8 @@ export async function getItemSlots(file: File, threshold: number = 100): Promise
         if (shouldKeep) uniqueBlobs.push(b);
       }
 
-      // 상위 40개 제한 (성능)
-      resolve(uniqueBlobs.slice(0, 40));
+      // 상위 24개 제한 (성능)
+      resolve(uniqueBlobs.slice(0, 24));
     };
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
