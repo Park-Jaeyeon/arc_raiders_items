@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { Layout } from './components/Layout';
 import { InventoryImageInput } from './components/InventoryImageInput';
 import { InventoryTextInput } from './components/InventoryTextInput';
 import { ResultTable } from './components/ResultTable';
+import { ModelLoader } from './components/ModelLoader'; // 로더 추가
 import { useOcr } from './hooks/useOcr';
 import { useAiVision } from './hooks/useAiVision'; // AI 훅 추가
-import { ModelLoader } from './components/ModelLoader'; // 로더 추가
 import { classifyItems } from './logic/classify';
 import { findKnownItems } from './logic/findItems';
-import { ChevronRight } from 'lucide-react';
+import { BoundingBox } from './logic/blobDetector';
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -16,7 +17,7 @@ function App() {
   const [text, setText] = useState<string>("");
   
   // 기존 OCR (빠른 분석용)
-  const { processImage, getPreview, loading: ocrLoading, progress: ocrProgress, error: ocrError } = useOcr();
+  const { processImage, loading: ocrLoading, progress: ocrProgress, error: ocrError } = useOcr();
   
   // 신규 AI Vision (무거운 모델 로딩 및 정밀 분석용)
   const { analyzeImage, status: aiStatus, progress: aiProgress, results: aiResults } = useAiVision();
@@ -41,9 +42,7 @@ function App() {
         .join('\n');
       
       if (formattedText) {
-        setText(prev => {
-          return `--- AI Visual Analysis ---\n${formattedText}`;
-        });
+        setText(`--- AI Visual Analysis ---\n${formattedText}`);
       }
     }
   }, [aiResults]);
@@ -71,17 +70,22 @@ function App() {
     // ★ AI 비전 분석 시작 (이미지 자체를 분석)
     // 텍스트 창에 분석 중임을 표시
     setText("🔄 AI가 이미지를 정밀 분석 중입니다...\n\n잠시만 기다려주세요.\n(처음 실행 시 모델 다운로드로 인해 10초 이상 소요될 수 있습니다)");
-    
+
     // 기본 threshold 100으로 시작 (사용자가 나중에 조절 가능)
-    analyzeImage(selectedFile, 100);
+    analyzeImage(selectedFile, { threshold: 100 });
   };
 
-  const handleReanalyze = async (options: { threshold: number; invert: boolean }) => {
+  const handleReanalyze = async (options: { threshold: number; invert: boolean; manualBlobs?: BoundingBox[] }) => {
     if (!file) return;
 
-    // 사용자가 슬라이더로 조절한 threshold로 AI 재분석 요청
-    setText(`🔄 재설정된 감도(${options.threshold})로 슬롯을 다시 찾고 있습니다...`);
-    analyzeImage(file, options.threshold);
+    if (options.manualBlobs && options.manualBlobs.length > 0) {
+       setText(`🔄 사용자가 지정한 ${options.manualBlobs.length}개 영역을 정밀 분석 중입니다...`);
+       analyzeImage(file, { manualBlobs: options.manualBlobs });
+    } else {
+       // 슬라이더 조절 시
+       setText(`🔄 재설정된 감도(${options.threshold})로 슬롯을 다시 찾고 있습니다...`);
+       analyzeImage(file, { threshold: options.threshold });
+    }
   };
 
   // Cleanup object URL

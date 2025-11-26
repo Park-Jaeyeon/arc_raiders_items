@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Loader2, Cpu, Wifi, HardDrive } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Cpu, Wifi, HardDrive } from 'lucide-react';
 
 interface Props {
   status: 'idle' | 'loading_model' | 'ready' | 'analyzing' | 'error';

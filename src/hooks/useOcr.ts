@@ -74,18 +74,20 @@ export function useOcr() {
       const preprocessedImageUrl = await preprocessImage(file, options);
 
       // 2. OCR 수행
+      const recognitionOptions = {
+        logger: (m: any) => {
+          if (m.status === 'recognizing text') {
+            setProgress(m.progress);
+          }
+        },
+        // 설정 튜닝 (공식 타입에는 없어서 캐스팅)
+        tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:xX()[]/-. ',
+      } as const;
+
       const result = await Tesseract.recognize(
         preprocessedImageUrl,
         'eng',
-        {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              setProgress(m.progress);
-            }
-          },
-          // 설정 튜닝
-          tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:xX()[]/-. ',
-        }
+        recognitionOptions as unknown as Tesseract.WorkerOptions
       );
 
       // Page Segmentation Mode 설정 (11: Sparse text = 띄엄띄엄 있는 텍스트)

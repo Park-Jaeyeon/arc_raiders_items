@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BoundingBox, getItemSlots, cropItemSlots } from '../logic/blobDetector';
 import { ITEMS_DB } from '../data/items';
-import { getItemSlots, cropItemSlots } from '../logic/blobDetector';
 
 interface AnalysisResult {
   imageUrl: string;
@@ -10,14 +10,15 @@ interface AnalysisResult {
 }
 
 export function useAiVision() {
+  // ... (state definitions)
   const [status, setStatus] = useState<'idle' | 'loading_model' | 'ready' | 'analyzing' | 'error'>('idle');
   const [progress, setProgress] = useState<{ file: string; progress: number; status: string } | null>(null);
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const workerRef = useRef<Worker | null>(null);
 
-  // CLIP에게 물어볼 후보군 (DB에 있는 모든 아이템 이름)
-  const labels = Object.keys(ITEMS_DB);
+  const labels = useMemo(() => Object.keys(ITEMS_DB), []);
 
+  // ... (useEffect worker setup)
   useEffect(() => {
     const worker = new Worker(new URL('../worker.ts', import.meta.url), {
       type: 'module'
@@ -35,10 +36,8 @@ export function useAiVision() {
         setStatus('ready');
         setProgress(null);
       } else if (type === 'result') {
-        // result: [{ label: "...", score: ... }, ...] (Top 3)
         if (Array.isArray(result) && result.length > 0) {
           const topMatch = result[0];
-          
           setResults(prev => {
             const newResults = [...prev];
             if (newResults[id]) {
@@ -46,7 +45,7 @@ export function useAiVision() {
                 ...newResults[id],
                 topLabel: topMatch.label,
                 score: topMatch.score,
-                candidates: result // 전체 Top 3 저장
+                candidates: result
               };
             }
             return newResults;
@@ -66,23 +65,32 @@ export function useAiVision() {
     };
   }, []);
 
-  const analyzeImage = useCallback(async (file: File, threshold: number = 100) => {
+  // analyzeImage 수정: threshold 또는 manualBlobs를 받음
+  const analyzeImage = useCallback(async (file: File, options?: { threshold?: number, manualBlobs?: BoundingBox[] }) => {
     if (!workerRef.current) return;
     
     setStatus('analyzing');
     setResults([]); // 초기화
 
     try {
-      // 1. 이미지에서 아이템 슬롯(Blob) 좌표를 찾습니다.
-      const blobs = await getItemSlots(file, threshold);
+      let blobs: BoundingBox[] = [];
+
+      if (options?.manualBlobs && options.manualBlobs.length > 0) {
+        // 수동 박스가 있으면 그것만 사용
+        blobs = options.manualBlobs;
+        console.log(`Using ${blobs.length} manual slots.`);
+      } else {
+        // 없으면 자동 감지
+        const threshold = options?.threshold ?? 100;
+        blobs = await getItemSlots(file, threshold);
+        console.log(`Detected ${blobs.length} item slots (Auto, threshold ${threshold}).`);
+      }
       
       if (blobs.length === 0) {
-        console.warn("No items detected via blob detection.");
+        console.warn("No items detected.");
         setStatus('ready');
         return;
       }
-      
-      console.log(`Detected ${blobs.length} item slots with threshold ${threshold}. analyzing...`);
 
       // 2. 좌표대로 이미지를 자릅니다.
       const itemImages = await cropItemSlots(file, blobs);
