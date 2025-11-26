@@ -22,9 +22,39 @@ export function InventoryImageInput({ file, previewUrl, loading, progress, onFil
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState<{x: number, y: number} | null>(null);
   const [currentDragBox, setCurrentDragBox] = useState<BoundingBox | null>(null);
-  
+
   const imgRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const getMedian = (values: number[]) => {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+  };
+
+  const expandToSlotCells = () => {
+    const img = imgRef.current;
+    if (!img || detectedBlobs.length === 0) return;
+
+    const medianW = getMedian(detectedBlobs.map(b => b.width));
+    const medianH = getMedian(detectedBlobs.map(b => b.height));
+    const slotW = medianW * 1.35;
+    const slotH = medianH * 1.35;
+
+    const expanded = detectedBlobs.map(b => {
+      const cx = b.x + b.width / 2;
+      const cy = b.y + b.height / 2;
+      const x = Math.max(0, cx - slotW / 2);
+      const y = Math.max(0, cy - slotH / 2);
+      const width = Math.min(slotW, img.naturalWidth - x);
+      const height = Math.min(slotH, img.naturalHeight - y);
+      return { x, y, width, height };
+    });
+
+    setDetectedBlobs(expanded);
+    onReanalyze({ threshold, invert, manualBlobs: expanded });
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -262,21 +292,22 @@ export function InventoryImageInput({ file, previewUrl, loading, progress, onFil
                  </h3>
                </div>
 
-               <div className="p-3 bg-black/40 rounded text-xs text-neutral-400 space-y-1 border border-neutral-800">
+                <div className="p-3 bg-black/40 rounded text-xs text-neutral-400 space-y-1 border border-neutral-800">
                   <p>• <span className="text-amber-500 font-bold">드래그</span>: 누락된 아이템 박스 직접 그리기</p>
                   <p>• <span className="text-red-500 font-bold">우클릭</span>: 잘못된 박스 삭제</p>
                   <p>• <span className="text-neutral-300 font-bold">슬라이더</span>: 전체 감도 재설정 (초기화)</p>
                   <p>• <span className="text-amber-400 font-bold">전체 영역</span>: 슬롯 자동 분할이 답답할 때 한 번에 분석</p>
-               </div>
+                  <p>• <span className="text-blue-400 font-bold">칸 확장</span>: 감지된 작은 박스를 슬롯 칸 크기로 키워 분석</p>
+                </div>
 
-               <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-neutral-400">
-                    <span>자동 감지 감도: {threshold}</span>
-                    <span>{detecting ? '조정 중...' : '완료'}</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="10" 
+                <div className="space-y-2">
+                   <div className="flex justify-between text-xs text-neutral-400">
+                     <span>자동 감지 감도: {threshold}</span>
+                     <span>{detecting ? '조정 중...' : '완료'}</span>
+                   </div>
+                   <input 
+                     type="range" 
+                     min="10" 
                     max="240" 
                     step="5"
                     value={threshold} 
@@ -290,6 +321,14 @@ export function InventoryImageInput({ file, previewUrl, loading, progress, onFil
                   className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 rounded text-xs font-semibold border border-neutral-700 transition-colors"
                 >
                   이미지 전체를 단일 영역으로 지정
+                </button>
+
+                <button
+                  onClick={expandToSlotCells}
+                  className="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-100 rounded text-xs font-semibold border border-neutral-700 transition-colors"
+                  disabled={detectedBlobs.length === 0}
+                >
+                  감지 박스를 슬롯 칸 크기로 확장
                 </button>
 
                 <button 
