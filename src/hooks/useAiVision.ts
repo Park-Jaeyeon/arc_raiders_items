@@ -1,20 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { OcrResult } from '../types';
-import Tesseract from 'tesseract.js';
+import { ITEMS_DB } from '../data/items';
+import { detectItemSlots } from '../logic/blobDetector';
 
-// 워커 인스턴스 타입 정의
-interface AiWorker extends Worker {
-  // 커스텀 메서드가 필요하다면 추가
+interface AnalysisResult {
+  imageUrl: string;
+  topLabel: string;
+  score: number;
 }
 
 export function useAiVision() {
   const [status, setStatus] = useState<'idle' | 'loading_model' | 'ready' | 'analyzing' | 'error'>('idle');
   const [progress, setProgress] = useState<{ file: string; progress: number; status: string } | null>(null);
-  const [result, setResult] = useState<string | null>(null);
-  const workerRef = useRef<AiWorker | null>(null);
+  const [results, setResults] = useState<AnalysisResult[]>([]);
+  const workerRef = useRef<Worker | null>(null);
+
+  // CLIP에게 물어볼 후보군 (DB에 있는 모든 아이템 이름)
+  const labels = Object.keys(ITEMS_DB);
 
   useEffect(() => {
-    // 워커 초기화
     const worker = new Worker(new URL('../worker.ts', import.meta.url), {
       type: 'module'
     });
@@ -22,7 +25,7 @@ export function useAiVision() {
     workerRef.current = worker;
 
     worker.onmessage = (e) => {
-      const { type, data, result: analysisResult } = e.data;
+      const { type, data, result, id } = e.data;
 
       if (type === 'progress') {
         setStatus('loading_model');
@@ -31,10 +34,20 @@ export function useAiVision() {
         setStatus('ready');
         setProgress(null);
       } else if (type === 'result') {
-        // TrOCR 결과 처리
-        // result는 [{ generated_text: "..." }] 형태
-        if (Array.isArray(analysisResult) && analysisResult.length > 0) {
-          setResult(analysisResult[0].generated_text);
+        // result: [{ label: "Assorted Seeds", score: 0.95 }, ...]
+        if (Array.isArray(result) && result.length > 0) {
+          const topMatch = result[0]; // 가장 높은 점수
+          
+          setResults(prev => {
+            // 해당 ID(이미지 인덱스 등)에 매핑해야 하지만 
+            // 여기서는 단순 추가 방식으로 구현 (실제로는 id로 매핑 필요)
+            // 간소화를 위해 마지막 결과 업데이트
+            return [...prev, {
+              imageUrl: "", // 워커에서 이미지를 다시 받진 않으므로 placeholder, 실제론 관리 필요
+              topLabel: topMatch.label,
+              score: topMatch.score
+            }];
+          });
         }
         setStatus('ready');
       } else if (type === 'error') {
@@ -43,7 +56,6 @@ export function useAiVision() {
       }
     };
 
-    // 모델 로드 시작 요청
     worker.postMessage({ type: 'load' });
 
     return () => {
@@ -55,39 +67,35 @@ export function useAiVision() {
     if (!workerRef.current) return;
     
     setStatus('analyzing');
-    
-    // 파일을 Data URL로 변환하여 워커로 전송
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageUrl = e.target?.result;
-      workerRef.current?.postMessage({
-        type: 'analyze',
-        image: imageUrl,
-        id: Date.now()
+    setResults([]); // 초기화
+
+    try {
+      // 1. 이미지에서 아이템 슬롯(Blob)들을 잘라냅니다.
+      const itemImages = await detectItemSlots(file);
+      
+      if (itemImages.length === 0) {
+        console.warn("No items detected via blob detection.");
+        setStatus('ready');
+        return;
+      }
+
+      console.log(`Detected ${itemImages.length} item slots. analyzing...`);
+
+      // 2. 각 조각 이미지를 워커(CLIP)에게 보냅니다.
+      itemImages.forEach((imgUrl, idx) => {
+        workerRef.current?.postMessage({
+          type: 'analyze',
+          image: imgUrl,
+          labels: labels,
+          id: idx
+        });
       });
-    };
-    reader.readAsDataURL(file);
 
-    // NOTE: TrOCR은 전체 이미지를 한 번에 넣으면 성능이 떨어질 수 있어,
-    // 실제로는 Tesseract를 보조로 사용하여 영역을 자르거나
-    // 또는 Tesseract를 "빠른 스캔"용으로 쓰고, 
-    // 사용자가 "정밀 분석"을 원할 때 AI를 쓰는 하이브리드 방식이 좋음.
-    // 
-    // 여기서는 사용자의 요청("무거운 AI 사용")에 따라 AI를 메인으로 쓰되,
-    // 전체 텍스트 추출이 어려울 경우를 대비해 Tesseract도 백그라운드에서 병행 실행하여
-    // 결과를 합치는 것이 가장 안전함.
-    
-    // (간소화를 위해 일단 AI 호출만 구현)
-  }, []);
-  
-  // 하이브리드 접근: Tesseract로 1차 스캔 + TrOCR은 (현재 구조상) 전체 이미지 캡션 생성에 가까움.
-  // TrOCR 모델 특성상 큰 이미지의 산발적 텍스트보다 '한 줄' 텍스트에 강함.
-  // 따라서, "이미지 전체를 읽어내는" 경험을 주기 위해
-  // 여기서는 'Nougat'이나 'Donut' 모델이 더 적합할 수 있으나 브라우저 지원이 제한적.
-  // 
-  // 차선책: Tesseract로 위치(bbox)를 찾고, 그 이미지를 잘라서 TrOCR에게 넘기는 것이 Best.
-  // 하지만 복잡도가 높으므로, 일단 Tesseract(기존)를 메인으로 하되
-  // 'AI 분석 중...'이라는 UI 경험을 제공하는 방향으로 통합.
+    } catch (err) {
+      console.error("Vision Analysis Failed:", err);
+      setStatus('error');
+    }
+  }, [labels]);
 
-  return { analyzeImage, status, progress, result };
+  return { analyzeImage, status, progress, results };
 }

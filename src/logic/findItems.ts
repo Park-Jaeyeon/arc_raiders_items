@@ -28,8 +28,7 @@ export function findKnownItems(text: string): RawItem[] {
 
     // 2. 1차 필터: "DB에 있는 키워드가 하나라도 포함되어 있는가?"
     // 노이즈를 획기적으로 줄이는 단계
-    const lineWords = cleanLine.toLowerCase().split(/[
-\s\W]+/); // 공백/특수문자로 분리
+    const lineWords = cleanLine.toLowerCase().split(/[\s\W]+/); // 공백/특수문자로 분리
     const hasKeyword = lineWords.some(word => 
       word.length >= 3 && dbKeywords.has(word)
     );
