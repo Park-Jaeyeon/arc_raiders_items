@@ -1,23 +1,19 @@
 import { pipeline, env } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
-// Configure Transformers.js to use local models
-env.allowLocalModels = true;
-env.allowRemoteModels = false;
-env.localModelPath = '/models/';
+// Switch back to CDN loading due to local file corruption issues.
+// Browser cache will handle subsequent loads.
+env.allowLocalModels = false;
+env.allowRemoteModels = true;
 
 class VisionPipeline {
   static instance: any = null;
 
   static async getInstance() {
     if (!this.instance) {
-      console.log('Loading CLIP model from local resources...');
-      
-      // The model name must match the folder name in public/models/
-      // i.e. public/models/clip-vit-base-patch32
-      // It expects 'onnx/model_quantized.onnx' inside that folder.
-      this.instance = await pipeline('zero-shot-image-classification', 'clip-vit-base-patch32', {
-          quantized: true,
+      console.log('Loading CLIP model from CDN...');
+      this.instance = await pipeline('zero-shot-image-classification', 'Xenova/clip-vit-base-patch32', {
+        quantized: true,
       });
     }
     return this.instance;
