@@ -33,19 +33,21 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
-export const useAiVision = () => {
-  const [worker, setWorker] = useState<Worker | null>(null);
-  const [isReady, setIsReady] = useState(false);
-  const pendingPromises = useRef<Map<string, (result: any) => void>>(new Map());
+// --- Worker Singleton ---
+// 워커 인스턴스를 모듈 스코프에 두어 앱 생명주기 동안 유지합니다.
+let globalWorker: Worker | null = null;
+const workerPendingPromises = new Map<string, (result: any) => void>();
 
-  useEffect(() => {
-    const w = new Worker(new URL('../worker.ts', import.meta.url), {
+// 워커 초기화 함수 (최초 1회만 실행됨)
+function getWorker(): Worker {
+  if (!globalWorker) {
+    globalWorker = new Worker(new URL('../worker.ts', import.meta.url), {
       type: 'module',
     });
 
-    w.onmessage = (e) => {
+    globalWorker.onmessage = (e) => {
       const { id, status, result, error } = e.data;
-      const resolver = pendingPromises.current.get(id);
+      const resolver = workerPendingPromises.get(id);
       
       if (resolver) {
         if (status === 'success') {
@@ -54,21 +56,33 @@ export const useAiVision = () => {
           console.error(error);
           resolver(null);
         }
-        pendingPromises.current.delete(id);
+        workerPendingPromises.delete(id);
       }
     };
+    
+    console.log("[AiVision] Worker initialized (Singleton)");
+  }
+  return globalWorker;
+}
 
-    setWorker(w);
+export const useAiVision = () => {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 워커가 준비되었는지 확인하고 초기화
+    const w = getWorker();
+    // 워커는 비동기 로딩이 아니므로(스크립트 로딩 제외) 즉시 사용 가능 간주
+    // 실제 모델 로딩은 워커 내부에서 첫 요청 시 이루어짐
     setIsReady(true);
-
-    return () => w.terminate();
+    
+    // Cleanup: 전역 워커이므로 컴포넌트 언마운트 시 terminate 하지 않음!
   }, []);
 
   const analyzeImage = useCallback(async (
     imageBlob: Blob, 
     hintText: string = ''
   ): Promise<AnalysisResult | null> => {
-    if (!worker || !isReady) return null;
+    const worker = getWorker(); // 항상 동일한 인스턴스 반환
 
     const id = Math.random().toString(36).substring(7);
     const imageUrl = URL.createObjectURL(imageBlob);
@@ -93,14 +107,14 @@ export const useAiVision = () => {
     }
 
     return new Promise((resolve) => {
-      pendingPromises.current.set(id, resolve);
+      workerPendingPromises.set(id, resolve);
       worker.postMessage({ 
         id, 
         image: imageUrl,
         candidateLabels 
       });
     });
-  }, [worker, isReady]);
+  }, []);
 
   return { analyzeImage, isReady };
 };
