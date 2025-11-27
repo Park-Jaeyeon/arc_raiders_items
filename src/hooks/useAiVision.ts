@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ITEMS } from '../data/items';
 
 interface AnalysisResult {
@@ -34,11 +34,9 @@ function levenshteinDistance(a: string, b: string): number {
 }
 
 // --- Worker Singleton ---
-// 워커 인스턴스를 모듈 스코프에 두어 앱 생명주기 동안 유지합니다.
 let globalWorker: Worker | null = null;
 const workerPendingPromises = new Map<string, (result: any) => void>();
 
-// 워커 초기화 함수 (최초 1회만 실행됨)
 function getWorker(): Worker {
   if (!globalWorker) {
     globalWorker = new Worker(new URL('../worker.ts', import.meta.url), {
@@ -69,29 +67,27 @@ export const useAiVision = () => {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 워커가 준비되었는지 확인하고 초기화
     const w = getWorker();
-    // 워커는 비동기 로딩이 아니므로(스크립트 로딩 제외) 즉시 사용 가능 간주
-    // 실제 모델 로딩은 워커 내부에서 첫 요청 시 이루어짐
     setIsReady(true);
-    
-    // Cleanup: 전역 워커이므로 컴포넌트 언마운트 시 terminate 하지 않음!
   }, []);
 
   const analyzeImage = useCallback(async (
     imageBlob: Blob, 
     hintText: string = ''
   ): Promise<AnalysisResult | null> => {
-    const worker = getWorker(); // 항상 동일한 인스턴스 반환
-
-    const id = Math.random().toString(36).substring(7);
-    const imageUrl = URL.createObjectURL(imageBlob);
-
-    let candidateLabels: string[] = [];
     
-    if (hintText && hintText.length > 2) {
+    // --- 1. Fast Path: OCR-based Bypass ---
+    // 텍스트가 명확하면 무거운 AI Vision 모델을 돌리지 않고 바로 결과를 반환합니다.
+    if (hintText && hintText.length >= 3) {
       const cleanHint = hintText.toLowerCase().trim();
       
+      // A. 단순 포함/일치 검색
+      const exactMatch = ITEMS.find(item => item.name.toLowerCase() === cleanHint);
+      if (exactMatch) {
+        return { label: exactMatch.name, score: 1.0 };
+      }
+
+      // B. Levenshtein 거리 계산 (오타 보정)
       const scoredItems = ITEMS.map((item: any) => {
         const dist = levenshteinDistance(cleanHint, item.name.toLowerCase());
         return { name: item.name, dist };
@@ -99,11 +95,35 @@ export const useAiVision = () => {
 
       scoredItems.sort((a: any, b: any) => a.dist - b.dist);
 
+      // 거리가 2 이하(매우 유사)면 신뢰하고 반환
       if (scoredItems[0].dist <= 2) {
-        candidateLabels = scoredItems.slice(0, 3).map((i: any) => i.name);
-      } else {
-        candidateLabels = scoredItems.slice(0, 10).map((i: any) => i.name);
+         // 글자 수가 짧은데 2글자 차이면 위험하므로 비율 체크
+         const len = scoredItems[0].name.length;
+         if (len > 4 || scoredItems[0].dist <= 1) {
+            return { label: scoredItems[0].name, score: 0.95 };
+         }
       }
+    }
+    // ---------------------------------------
+
+    // --- 2. Slow Path: AI Vision Model ---
+    const worker = getWorker();
+    const id = Math.random().toString(36).substring(7);
+    const imageUrl = URL.createObjectURL(imageBlob);
+
+    let candidateLabels: string[] = [];
+    
+    // AI에게 줄 후보군을 OCR 텍스트로 좁힘 (속도 향상)
+    if (hintText && hintText.length > 2) {
+      const cleanHint = hintText.toLowerCase().trim();
+      const scoredItems = ITEMS.map((item: any) => {
+        const dist = levenshteinDistance(cleanHint, item.name.toLowerCase());
+        return { name: item.name, dist };
+      });
+      scoredItems.sort((a: any, b: any) => a.dist - b.dist);
+      
+      // 상위 5~10개만 후보로 전달
+      candidateLabels = scoredItems.slice(0, 10).map((i: any) => i.name);
     }
 
     return new Promise((resolve) => {
