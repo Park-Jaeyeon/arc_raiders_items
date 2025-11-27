@@ -37,59 +37,68 @@ export function findItemBlobs(imageData: ImageData, threshold: number = 50): Rec
   const ROWS = Math.ceil(height / TILE_SIZE);
   
   // 1. Tile Analysis: Mark tiles that have enough activity (edges/variance)
+  // Using Uint8Array: 0 = inactive, 1 = active
   const activeTiles = new Uint8Array(COLS * ROWS);
   
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       let minVal = 255, maxVal = 0;
       
-      // Check pixels within this tile
       const startX = x * TILE_SIZE;
       const startY = y * TILE_SIZE;
       const endX = Math.min(startX + TILE_SIZE, width);
       const endY = Math.min(startY + TILE_SIZE, height);
       
-      for (let py = startY; py < endY; py += 2) { // Skip every other pixel for speed
+      for (let py = startY; py < endY; py += 2) { 
         for (let px = startX; px < endX; px += 2) {
           const idx = (py * width + px) * 4;
-          // Convert to approx grayscale brightness
           const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
           if (brightness < minVal) minVal = brightness;
           if (brightness > maxVal) maxVal = brightness;
         }
       }
       
-      // If contrast in this tile > threshold, mark as active
-      if ((maxVal - minVal) > (255 - threshold)) { // Invert logic: Higher threshold from UI = More sensitive? 
-        // Actually let's stick to: input threshold is "sensitivity".
-        // If input is 100 (high), we want to detect MORE. 
-        // So we check if (max - min) > (CONST / threshold)? 
-        // Let's assume the UI passes 0-255.
-        // If UI threshold is 50, we ignore contrast < 50.
-        // Wait, usually threshold means "cutoff". 
-        // If I set threshold 200, I expect ONLY very strong edges.
-        // If I set threshold 10, I expect almost everything.
-        if ((maxVal - minVal) > threshold) {
-           activeTiles[y * COLS + x] = 1;
-        }
+      if ((maxVal - minVal) > threshold) {
+         activeTiles[y * COLS + x] = 1;
       }
     }
   }
 
-  // 2. Connected Components (Union-Find)
-  const uf = new UnionFind(COLS * ROWS);
+  // 1.5. Morphological Closing (Dilation) - Fill gaps and connect nearby parts
+  // We copy the array to avoid cascading updates affecting the current pass
+  const dilatedTiles = new Uint8Array(activeTiles);
   
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       const idx = y * COLS + x;
       if (activeTiles[idx] === 0) continue;
 
-      // Check right neighbor
-      if (x + 1 < COLS && activeTiles[idx + 1] === 1) {
+      // If current tile is active, activate its 8 neighbors
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          const ny = y + dy;
+          const nx = x + dx;
+          if (nx >= 0 && nx < COLS && ny >= 0 && ny < ROWS) {
+            dilatedTiles[ny * COLS + nx] = 1;
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Connected Components (Union-Find) on the DILATED grid
+  const uf = new UnionFind(COLS * ROWS);
+  
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const idx = y * COLS + x;
+      if (dilatedTiles[idx] === 0) continue;
+
+      if (x + 1 < COLS && dilatedTiles[idx + 1] === 1) {
         uf.union(idx, idx + 1);
       }
-      // Check bottom neighbor
-      if (y + 1 < ROWS && activeTiles[idx + COLS] === 1) {
+      if (y + 1 < ROWS && dilatedTiles[idx + COLS] === 1) {
         uf.union(idx, idx + COLS);
       }
     }
@@ -101,7 +110,7 @@ export function findItemBlobs(imageData: ImageData, threshold: number = 50): Rec
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       const idx = y * COLS + x;
-      if (activeTiles[idx] === 0) continue;
+      if (dilatedTiles[idx] === 0) continue;
       
       const root = uf.find(idx);
       
@@ -117,23 +126,76 @@ export function findItemBlobs(imageData: ImageData, threshold: number = 50): Rec
     }
   }
 
-  // 4. Convert back to pixel coordinates and filter
-  const detectedRects: Rect[] = [];
+  // 4. Convert back to pixel coordinates
+  let rawRects: Rect[] = [];
   
   groups.forEach(g => {
-    // Add padding
     const x = g.minX * TILE_SIZE;
     const y = g.minY * TILE_SIZE;
     const w = (g.maxX - g.minX + 1) * TILE_SIZE;
     const h = (g.maxY - g.minY + 1) * TILE_SIZE;
     
-    // Filter noise: must be at least 30x30 pixels
-    if (w >= 30 && h >= 30) {
-       detectedRects.push({ x, y, width: w, height: h });
+    // Basic noise filter
+    if (w >= 20 && h >= 20) {
+       rawRects.push({ x, y, width: w, height: h });
     }
   });
 
-  return detectedRects;
+  // 5. Merge Overlapping/Nearby Boxes (Iterative)
+  // If two boxes are close, merge them.
+  // Repeat until no changes.
+  let changed = true;
+  const MERGE_DIST = TILE_SIZE * 2; // Merge if within 20px
+
+  while (changed) {
+    changed = false;
+    const merged: Rect[] = [];
+    const used = new Array(rawRects.length).fill(false);
+
+    for (let i = 0; i < rawRects.length; i++) {
+      if (used[i]) continue;
+      
+      let current = { ...rawRects[i] };
+      used[i] = true;
+      
+      // Try to merge with any other unused rect
+      for (let j = i + 1; j < rawRects.length; j++) {
+        if (used[j]) continue;
+        
+        const other = rawRects[j];
+        
+        // Check intersection or proximity
+        const isClose = !(
+          current.x > other.x + other.width + MERGE_DIST ||
+          other.x > current.x + current.width + MERGE_DIST ||
+          current.y > other.y + other.height + MERGE_DIST ||
+          other.y > current.y + current.height + MERGE_DIST
+        );
+        
+        if (isClose) {
+          // Merge
+          const minX = Math.min(current.x, other.x);
+          const minY = Math.min(current.y, other.y);
+          const maxX = Math.max(current.x + current.width, other.x + other.width);
+          const maxY = Math.max(current.y + current.height, other.y + other.height);
+          
+          current = {
+            x: minX,
+            y: minY,
+            width: maxX - minX,
+            height: maxY - minY
+          };
+          
+          used[j] = true;
+          changed = true; // We made a change, need another pass
+        }
+      }
+      merged.push(current);
+    }
+    rawRects = merged;
+  }
+
+  return rawRects;
 }
 
 export const getItemSlots = async (file: File, threshold: number): Promise<BoundingBox[]> => {
@@ -147,8 +209,6 @@ export const getItemSlots = async (file: File, threshold: number): Promise<Bound
       ctx.drawImage(img, 0, 0);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
-      // UI threshold is usually 0-255. Let's map it directly.
-      // If default is 100, it filters out low contrast noise.
       resolve(findItemBlobs(imageData, threshold));
     };
     img.src = URL.createObjectURL(file);
