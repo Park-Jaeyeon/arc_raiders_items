@@ -424,12 +424,17 @@ const ITEM_OVERRIDES: Record<string, Partial<ItemMetadata>> = {
   "Medium Gun Parts": { defaultKeepMin: 10, usedForCrafting: true },
   "Complex Gun Parts": { defaultKeepMin: 10, usedForCrafting: true },
 
-  // 퀘스트/드롭 특화 아이템
+  // 퀘스트/드롭 특화 아이템 (Wiki 기반 업데이트)
   "Antiseptic": { defaultKeepMin: 10, usedForQuests: true },
+  "ARC Alloy": { defaultKeepMin: 20, usedForCrafting: true, usedForQuests: true },
+  "Battery": { defaultKeepMin: 5, usedForQuests: true, category: 'material' },
   "Canister": { defaultKeepMin: 20, usedForCrafting: true },
   "Chemicals": { defaultKeepMin: 20, usedForCrafting: true },
+  "Durable Cloth": { defaultKeepMin: 20, usedForQuests: true, usedForCrafting: true },
   "Explosive Compound": { defaultKeepMin: 20, usedForCrafting: true },
+  "Fertilizer": { defaultKeepMin: 20, usedForQuests: true },
   "Fireball Burner": { defaultKeepMin: 5, usedForQuests: true },
+  "Great Mullein": { defaultKeepMin: 10, usedForQuests: true },
   "Hornet Driver": { defaultKeepMin: 5, usedForQuests: true },
   "Leaper Pulse Unit": { defaultKeepMin: 5, usedForQuests: true },
   "Power Rod": { defaultKeepMin: 10, usedForQuests: true },
@@ -437,9 +442,11 @@ const ITEM_OVERRIDES: Record<string, Partial<ItemMetadata>> = {
   "Sentinel Firing Core": { defaultKeepMin: 5, usedForQuests: true },
   "Snitch Scanner": { defaultKeepMin: 5, usedForQuests: true },
   "Surveyor Vault": { defaultKeepMin: 3, usedForQuests: true },
+  "Syringe": { defaultKeepMin: 10, usedForQuests: true },
   "Tick Pod": { defaultKeepMin: 10, usedForQuests: true },
   "Wasp Driver": { defaultKeepMin: 5, usedForQuests: true },
   "Water Pump": { defaultKeepMin: 2, usedForQuests: true },
+  "Wires": { defaultKeepMin: 20, usedForQuests: true },
 
   // 소모품 세부 튜닝
   "Adrenaline Shot": { defaultKeepMin: 5 },
