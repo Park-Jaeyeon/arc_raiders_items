@@ -143,22 +143,18 @@ function App() {
       const ocrResult = await runGlobalOcr(imageUrl);
       ocrResultRef.current = ocrResult; // 저장
       const ocrWords = ocrResult?.data.words || [];
-      addLog(`OCR 완료: ${ocrWords.length}개 단어 감지`);
+      addLog(`OCR 완료: ${ocrWords.length}개 텍스트 영역 감지`);
 
-      // 2. Grid Detection
-      addLog('인벤토리 그리드 자동 감지 중...');
+      // 2. Stop Auto-Run
+      // 사용자가 그리드를 확인하고 직접 실행하도록 변경 (정확도 이슈 해결)
+      addLog('--------------------------------');
+      addLog('이미지 로드가 완료되었습니다.');
+      addLog('왼쪽 미리보기에서 [빨간색 박스]가 아이템을 정확히 감싸는지 확인해주세요.');
+      addLog('박스가 맞지 않으면 드래그하여 수정하거나 [슬롯 편집 모드]를 사용하세요.');
+      addLog("준비가 되면 '현재 설정으로 분석 시작' 버튼을 눌러주세요.");
+      addLog('--------------------------------');
       
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0);
-      
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const blobs = findItemBlobs(imageData);
-      
-      // 3. Run Loop
-      await runAnalysisLoop(blobs, img, ocrWords);
+      setModelStatus('ready');
     };
 
     img.src = imageUrl;
