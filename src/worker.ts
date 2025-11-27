@@ -14,12 +14,25 @@ class VisionPipeline {
     if (!this.instance) {
       console.log('Loading CLIP model from local resources...');
       
-      // 이 모델 이름이 '/models/' + 'Xenova/clip-vit-base-patch32' 경로와 매핑됨
-      this.instance = await pipeline('zero-shot-image-classification', 'Xenova/clip-vit-base-patch32', {
-          quantized: true,
-          // @ts-ignore
-          device: 'webgpu',
-      });
+      try {
+        // Try WebGPU first for performance
+        console.log('Attempting to load with WebGPU...');
+        this.instance = await pipeline('zero-shot-image-classification', 'Xenova/clip-vit-base-patch32', {
+            quantized: true,
+            // @ts-ignore
+            device: 'webgpu',
+        });
+        console.log('Success: Model loaded with WebGPU');
+      } catch (e) {
+        console.warn('WebGPU initialization failed, falling back to CPU:', e);
+        
+        // Fallback to CPU
+        this.instance = await pipeline('zero-shot-image-classification', 'Xenova/clip-vit-base-patch32', {
+            quantized: true,
+            device: 'cpu',
+        });
+        console.log('Success: Model loaded with CPU');
+      }
     }
     return this.instance;
   }
@@ -34,6 +47,11 @@ self.onmessage = async (e) => {
       self.postMessage({ id, status: 'ready' });
     } catch (error) {
       console.error('Worker Init Error:', error);
+      self.postMessage({ 
+        id, 
+        status: 'error', 
+        error: error instanceof Error ? error.message : 'Initialization failed' 
+      });
     }
     return;
   }
