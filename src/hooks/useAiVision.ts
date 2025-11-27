@@ -45,6 +45,13 @@ function getWorker(): Worker {
 
     globalWorker.onmessage = (e) => {
       const { id, status, result, error } = e.data;
+
+      // Handle initialization ready message
+      if (status === 'ready') {
+        console.log("[AiVision] Model pre-loaded and ready.");
+        return;
+      }
+
       const resolver = workerPendingPromises.get(id);
       
       if (resolver) {
@@ -68,6 +75,8 @@ export const useAiVision = () => {
 
   useEffect(() => {
     const w = getWorker();
+    // Pre-load model immediately
+    w.postMessage({ type: 'init', id: 'init-sequence' });
     setIsReady(true);
   }, []);
 

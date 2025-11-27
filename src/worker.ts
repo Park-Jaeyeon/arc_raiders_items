@@ -17,6 +17,8 @@ class VisionPipeline {
       // 이 모델 이름이 '/models/' + 'Xenova/clip-vit-base-patch32' 경로와 매핑됨
       this.instance = await pipeline('zero-shot-image-classification', 'Xenova/clip-vit-base-patch32', {
           quantized: true,
+          // @ts-ignore
+          device: 'webgpu',
       });
     }
     return this.instance;
@@ -24,7 +26,17 @@ class VisionPipeline {
 }
 
 self.onmessage = async (e) => {
-  const { id, image, candidateLabels } = e.data;
+  const { id, type, image, candidateLabels } = e.data;
+
+  if (type === 'init') {
+    try {
+      await VisionPipeline.getInstance();
+      self.postMessage({ id, status: 'ready' });
+    } catch (error) {
+      console.error('Worker Init Error:', error);
+    }
+    return;
+  }
 
   try {
     const classifier = await VisionPipeline.getInstance();
