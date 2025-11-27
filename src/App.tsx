@@ -67,13 +67,21 @@ function App() {
         0, 0, blob.width, blob.height
       );
 
+      // [Text Mapping Fix]
+      // 아이템 이름/수량 텍스트는 보통 아이콘의 내부 혹은 바로 아래에 위치합니다.
+      // Blob 영역을 약간 아래로 확장하여 텍스트를 검색합니다.
+      const searchMarginBottom = blob.height * 0.6; // 아래로 60% 더 탐색
+
       const matchedWords = ocrWords.filter(w => {
         const wx = (w.bbox.x0 + w.bbox.x1) / 2;
         const wy = (w.bbox.y0 + w.bbox.y1) / 2;
-        return (
-          wx >= blob.x && wx <= blob.x + blob.width &&
-          wy >= blob.y && wy <= blob.y + blob.height
-        );
+        
+        // 가로: Blob 범위 내
+        const inX = wx >= blob.x && wx <= blob.x + blob.width;
+        // 세로: Blob 상단 ~ Blob 하단 + 여백
+        const inY = wy >= blob.y && wy <= (blob.y + blob.height + searchMarginBottom);
+        
+        return inX && inY;
       });
       
       const hintText = matchedWords.map((w: any) => w.text).join(' ');
@@ -83,8 +91,22 @@ function App() {
         const visionResult = await analyzeImage(blobData, hintText);
         
         if (visionResult) {
-          const qtyMatch = hintText.match(/(\d+)/);
-          const qty = qtyMatch ? parseInt(qtyMatch[0], 10) : 1;
+          // [Quantity Parsing Fix]
+          // 1. 'x' 뒤에 오는 숫자 우선 검색 (예: x50)
+          // 2. 아이템 이름에 포함된 숫자를 피하기 위해, 텍스트 끝부분의 숫자를 우선함
+          let qty = 1;
+          const xMatch = hintText.match(/x\s*(\d+)/i);
+          
+          if (xMatch) {
+            qty = parseInt(xMatch[1], 10);
+          } else {
+            // 'x'가 없으면 마지막에 등장하는 숫자를 수량으로 추정
+            const allNumbers = hintText.match(/(\d+)/g);
+            if (allNumbers && allNumbers.length > 0) {
+              // 숫자가 여러 개면 마지막 것이 수량일 확률이 높음 (이름에 숫자가 섞인 경우 대비)
+              qty = parseInt(allNumbers[allNumbers.length - 1], 10);
+            }
+          }
 
           rawItems.push({
             name: visionResult.label,
