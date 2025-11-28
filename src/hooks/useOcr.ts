@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import Tesseract from 'tesseract.js';
 import { OcrResult } from '../types';
+import { getSharedOcrWorker } from '../logic/ocrWorker';
 
 interface PreprocessOptions {
   scale: number;        // 확대 배율 (2~3 추천)
@@ -100,30 +101,19 @@ export function useOcr() {
     setProgress(0);
 
     try {
-      // 1. 전처리 수행
       const preprocessedImageUrl = await preprocessImage(file, options);
 
-      // 2. OCR 수행
-      const recognitionOptions = {
-        logger: (m: any) => {
-          if (m.status === 'recognizing text') {
-            setProgress(m.progress);
-          }
-        },
-        // 설정 튜닝 (공식 타입에는 없어서 캐스팅)
-        tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:xX()[]/-. ',
-      } as const;
+      const worker = await getSharedOcrWorker((m) => {
+        if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+          setProgress(m.progress);
+        }
+      });
 
-      const result = await Tesseract.recognize(
-        preprocessedImageUrl,
-        'eng',
-        recognitionOptions as unknown as Tesseract.WorkerOptions
-      );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await worker.setParameters?.({ tessedit_char_whitelist: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:xX()[]/-. ' });
+      const result = await worker.recognize(preprocessedImageUrl, { lang: 'eng' } as Tesseract.WorkerRecognizeOptions);
 
-      // Page Segmentation Mode 설정 (11: Sparse text = 띄엄띄엄 있는 텍스트)
-      // Tesseract.js에서는 recognize의 3번째 인자나, setParameters로 해야 함.
-      // 여기서는 간단히 recognize로 처리.
-      
       return {
         rawText: result.data.text,
         lines: result.data.lines.map(l => l.text)
@@ -138,7 +128,6 @@ export function useOcr() {
     }
   }, []);
 
-  // 전처리된 이미지 미리보기를 얻기 위한 헬퍼 함수
   const getPreview = useCallback((file: File, options: PreprocessOptions): Promise<string> => {
     return preprocessImage(file, options);
   }, []);

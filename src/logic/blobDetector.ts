@@ -143,6 +143,19 @@ const iou = (a: Rect, b: Rect) => {
   return interArea / unionArea;
 };
 
+const nonMaxSuppression = (boxes: Rect[], threshold = 0.55): Rect[] => {
+  if (boxes.length === 0) return [];
+  const sorted = [...boxes].sort((a, b) => (b.width * b.height) - (a.width * a.height));
+  const kept: Rect[] = [];
+
+  sorted.forEach((candidate) => {
+    const overlaps = kept.some((keptBox) => iou(keptBox, candidate) >= threshold);
+    if (!overlaps) kept.push(candidate);
+  });
+
+  return kept;
+};
+
 /**
  * Grid-based slot inference:
  * - CLIP UI는 규칙적인 격자이므로, blob이 희미하게 검출되더라도
@@ -206,7 +219,7 @@ const inferGridSlots = (rects: Rect[], width: number, height: number): Rect[] =>
     if (!duplicate) combined.push(candidate);
   });
 
-  return combined;
+  return nonMaxSuppression(combined, 0.5);
 };
 
 export function findItemBlobs(imageData: ImageData, threshold: number = 50): Rect[] {

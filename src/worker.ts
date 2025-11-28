@@ -2,7 +2,6 @@ import { pipeline, env } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
 // Configure Transformers.js to use local models
-// Path: /public/models/Xenova/clip-vit-base-patch32/
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
 env.localModelPath = '/models/'; 
@@ -35,37 +34,6 @@ class VisionPipeline {
   }
 }
 
-const hexToRgb = (hex: string) => {
-  const clean = hex.replace('#', '');
-  const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16);
-  return [(num >> 16) & 255, (num >> 8) & 255, num & 255].map(v => v / 255);
-};
-
-const seededRandom = (seed: number) => {
-  // xorshift32
-  seed ^= seed << 13;
-  seed ^= seed >> 17;
-  seed ^= seed << 5;
-  return (seed >>> 0) / 0xffffffff;
-};
-
-const pseudoEmbedding = (name: string, mainColor: string | undefined, dim = 128) => {
-  const vec = new Float32Array(dim);
-  const color = mainColor ? hexToRgb(mainColor) : [0.5, 0.5, 0.5];
-  vec[0] = color[0];
-  vec[1] = color[1];
-  vec[2] = color[2];
-
-  let seed = 0;
-  for (let i = 0; i < name.length; i++) seed += name.charCodeAt(i) * (i + 1);
-
-  for (let i = 3; i < dim; i++) {
-    seed = Math.imul(seed ^ 0x9e3779b9, 0x85ebca6b);
-    vec[i] = seededRandom(seed);
-  }
-  return normalize(vec);
-};
-
 const normalize = (arr: ArrayLike<number>): number[] => {
   let norm = 0;
   for (let i = 0; i < arr.length; i++) norm += arr[i] * arr[i];
@@ -80,10 +48,23 @@ const cosineSimilarity = (a: number[], b: number[]) => {
   return dot;
 };
 
-const REFERENCE_EMBEDDINGS: Record<string, number[]> = ITEMS.reduce((acc, item) => {
-  acc[item.name] = pseudoEmbedding(item.name, item.mainColor);
-  return acc;
-}, {} as Record<string, number[]>);
+let embeddingsPromise: Promise<Record<string, number[]>> | null = null;
+
+const loadEmbeddings = async () => {
+  if (!embeddingsPromise) {
+    embeddingsPromise = (async () => {
+      const res = await fetch('/embeddings.json');
+      const json = await res.json() as Record<string, number[]>;
+      const normalized: Record<string, number[]> = {};
+      Object.entries(json).forEach(([name, vec]) => {
+        if (!Array.isArray(vec)) return;
+        normalized[name] = normalize(vec as number[]);
+      });
+      return normalized;
+    })();
+  }
+  return embeddingsPromise;
+};
 
 const embedImage = async (image: string): Promise<number[]> => {
   const extractor = await VisionPipeline.getInstance();
@@ -115,12 +96,20 @@ self.onmessage = async (e) => {
       ? candidateLabels 
       : ITEMS.map((item: any) => item.name);
 
+    const embeddings = await loadEmbeddings();
     const queryEmbedding = await embedImage(image);
 
-    const scored = labelsToCheck.map((label: string) => {
-      const ref = REFERENCE_EMBEDDINGS[label] ?? pseudoEmbedding(label, undefined);
-      return { label, score: cosineSimilarity(queryEmbedding, ref) };
-    });
+    const scored = labelsToCheck
+      .map((label: string) => {
+        const ref = embeddings[label];
+        if (!ref) return null;
+        return { label, score: cosineSimilarity(queryEmbedding, ref) };
+      })
+      .filter(Boolean) as { label: string; score: number }[];
+
+    if (scored.length === 0) {
+      throw new Error('No embeddings available for candidate labels.');
+    }
 
     scored.sort((a, b) => b.score - a.score);
     const top = scored[0];

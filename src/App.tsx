@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { ChevronRight, Activity } from 'lucide-react';
-import { createWorker, RecognizeResult } from 'tesseract.js';
+import { RecognizeResult } from 'tesseract.js';
 import { Layout } from './components/Layout';
 import { InventoryImageInput } from './components/InventoryImageInput';
 import { InventoryTextInput } from './components/InventoryTextInput';
@@ -10,6 +10,7 @@ import { useAiVision } from './hooks/useAiVision';
 import { Rect } from './logic/blobDetector';
 import { classifyItems } from './logic/classify';
 import { ClassifiedItem } from './types';
+import { getSharedOcrWorker } from './logic/ocrWorker';
 
 function App() {
   const [status, setStatus] = useState('준비됨');
@@ -36,7 +37,7 @@ function App() {
     setStatus(msg);
   };
 
-  // 공통 분석 로직 (Blob 리스트 -> AI 분석)
+  // 공통 분석 로직 (Blob 리스트 -> AI 분석) with batch parallelism + progressive rendering
   const runAnalysisLoop = async (blobs: Rect[], img: HTMLImageElement, ocrWords: any[]) => {
     if (blobs.length === 0) {
       addLog('분석할 영역이 없습니다.');
@@ -53,10 +54,11 @@ function App() {
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(img, 0, 0);
 
-    const rawItems = [];
+    const rawItems: { name: string; qty: number }[] = [];
     let processedCount = 0;
+    const BATCH_SIZE = 4;
 
-    for (const blob of blobs) {
+    const processBlob = async (blob: Rect) => {
       const itemCanvas = document.createElement('canvas');
       itemCanvas.width = blob.width;
       itemCanvas.height = blob.height;
@@ -67,62 +69,55 @@ function App() {
         0, 0, blob.width, blob.height
       );
 
-      // [Text Mapping Fix]
-      // 아이템 이름/수량 텍스트는 보통 아이콘의 내부 혹은 바로 아래에 위치합니다.
-      // Blob 영역을 약간 아래로 확장하여 텍스트를 검색합니다.
-      const searchMarginBottom = blob.height * 0.6; // 아래로 60% 더 탐색
+      const searchMarginBottom = blob.height * 0.6;
 
-      const matchedWords = ocrWords.filter(w => {
+      const matchedWords = ocrWords.filter((w: any) => {
         const wx = (w.bbox.x0 + w.bbox.x1) / 2;
         const wy = (w.bbox.y0 + w.bbox.y1) / 2;
-        
-        // 가로: Blob 범위 내
         const inX = wx >= blob.x && wx <= blob.x + blob.width;
-        // 세로: Blob 상단 ~ Blob 하단 + 여백
         const inY = wy >= blob.y && wy <= (blob.y + blob.height + searchMarginBottom);
-        
         return inX && inY;
       });
       
       const hintText = matchedWords.map((w: any) => w.text).join(' ');
       const blobData = await new Promise<Blob | null>(resolve => itemCanvas.toBlob(resolve));
       
-      if (blobData) {
-        const visionResult = await analyzeImage(blobData, hintText);
-        
-        if (visionResult) {
-          // [Quantity Parsing Fix]
-          // 1. 'x' 뒤에 오는 숫자 우선 검색 (예: x50)
-          // 2. 아이템 이름에 포함된 숫자를 피하기 위해, 텍스트 끝부분의 숫자를 우선함
-          let qty = 1;
-          const xMatch = hintText.match(/x\s*(\d+)/i);
-          
-          if (xMatch) {
-            qty = parseInt(xMatch[1], 10);
-          } else {
-            // 'x'가 없으면 마지막에 등장하는 숫자를 수량으로 추정
-            const allNumbers = hintText.match(/(\d+)/g);
-            if (allNumbers && allNumbers.length > 0) {
-              // 숫자가 여러 개면 마지막 것이 수량일 확률이 높음 (이름에 숫자가 섞인 경우 대비)
-              qty = parseInt(allNumbers[allNumbers.length - 1], 10);
-            }
-          }
+      if (!blobData) return null;
 
-          rawItems.push({
-            name: visionResult.label,
-            qty: qty
-          });
+      const visionResult = await analyzeImage(blobData, hintText);
+      if (!visionResult) return null;
+
+      let qty = 1;
+      const xMatch = hintText.match(/x\s*(\d+)/i);
+      if (xMatch) {
+        qty = parseInt(xMatch[1], 10);
+      } else {
+        const allNumbers = hintText.match(/(\d+)/g);
+        if (allNumbers && allNumbers.length > 0) {
+          qty = parseInt(allNumbers[allNumbers.length - 1], 10);
         }
       }
 
-      processedCount++;
+      return { name: visionResult.label, qty };
+    };
+
+    for (let i = 0; i < blobs.length; i += BATCH_SIZE) {
+      const chunk = blobs.slice(i, i + BATCH_SIZE);
+      const chunkResults = await Promise.all(chunk.map(processBlob));
+
+      chunkResults.forEach((item) => {
+        if (!item) return;
+        rawItems.push(item);
+      });
+
+      processedCount += chunk.length;
       setProgress((processedCount / blobs.length) * 100);
+
+      const classified = classifyItems(rawItems);
+      setResults(classified);
     }
 
-    const classified = classifyItems(rawItems);
-    setResults(classified);
-    
-    const summary = classified.map(i => `- ${i.name} (x${i.qty}) : ${i.action}`).join('\n');
+    const summary = classifyItems(rawItems).map(i => `- ${i.name} (x${i.qty}) : ${i.action}`).join('\n');
     addLog(`분석 완료.\n[결과 요약]\n${summary}`);
     setStatus('분석 완료');
     setModelStatus('ready');
@@ -131,10 +126,9 @@ function App() {
   const runGlobalOcr = async (imageUrl: string): Promise<RecognizeResult | null> => {
     addLog('전체 OCR 실행 중...');
     try {
-      const worker = await createWorker('eng');
+      const worker = await getSharedOcrWorker();
       const ret = await worker.recognize(imageUrl);
-      await worker.terminate();
-      return ret;
+      return ret as RecognizeResult;
     } catch (e) {
       console.error("OCR Failed", e);
       addLog('OCR 실패');
