@@ -10,6 +10,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { pipeline, env } from '@xenova/transformers';
+import fetch, { Response } from 'node-fetch';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,10 +106,20 @@ async function main() {
   const extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', { quantized: true });
 
   const result = {};
+  // file:// 경로를 지원하기 위해 fetch를 오버라이드
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (typeof url === 'string' && url.startsWith('file://')) {
+      const filePath = url.replace('file://', '');
+      const buf = await fs.readFile(filePath);
+      return new Response(buf, { status: 200 });
+    }
+    return fetch(url, options);
+  };
+
   for (const { name, file } of pairs) {
-    const buffer = await fs.readFile(file);
-    const dataUrl = `data:image/png;base64,${buffer.toString('base64')}`;
-    const output = await extractor(dataUrl, { pooling: 'mean', normalize: true });
+    const fileUrl = pathToFileURL(file).href;
+    const output = await extractor(fileUrl, { pooling: 'mean', normalize: true });
     const vec = Array.from(output.data ?? output);
     result[name] = normalize(vec);
   }
