@@ -33,6 +33,16 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
+// Helper to convert Blob to Data URL (Base64)
+const blobToDataURL = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 // --- Worker Singleton ---
 let globalWorker: Worker | null = null;
 const workerPendingPromises = new Map<string, (result: any) => void>();
@@ -121,6 +131,15 @@ export const useAiVision = () => {
     const worker = getWorker();
     const id = Math.random().toString(36).substring(7);
     
+    // Convert Blob to Base64 Data URL
+    let imageDataUrl: string;
+    try {
+      imageDataUrl = await blobToDataURL(imageBlob);
+    } catch (e) {
+      console.error("Failed to convert blob to base64", e);
+      return null;
+    }
+
     let candidateLabels: string[] = [];
     
     // AI에게 줄 후보군을 OCR 텍스트로 좁힘 (속도 향상)
@@ -141,7 +160,7 @@ export const useAiVision = () => {
       workerPendingPromises.set(id, resolve);
       worker.postMessage({ 
         id, 
-        image: imageBlob,
+        image: imageDataUrl,
         candidateLabels 
       });
     });
