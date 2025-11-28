@@ -64,6 +64,10 @@ const embedImage = async (image: string | Blob): Promise<number[]> => {
     imgInput = await res.blob();
   }
   const inputs = await processor(imgInput, { return_tensors: 'np' });
+  if (!inputs.pixel_values) {
+    console.error('[Worker] processor output missing pixel_values. keys:', Object.keys(inputs));
+    throw new Error('processor did not return pixel_values');
+  }
   const { image_embeds } = await model(inputs);
   const vec = Array.from(image_embeds.data as ArrayLike<number>);
   return normalize(vec);
