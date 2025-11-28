@@ -59,9 +59,9 @@ const loadEmbeddings = async () => {
 const embedImage = async (image: string | Blob): Promise<number[]> => {
   const { processor, model } = await VisionPipeline.getInstance();
   // 1) 이미지 전처리 (pixel_values 생성)
-  const inputs = await processor(image, { return_tensors: 'np' });
-  // 2) 모델 추론
-  const { image_embeds } = await model(inputs);
+  const processed = await processor({ images: image }, { return_tensors: 'np' });
+  // 2) 모델 추론 (pixel_values만 전달)
+  const { image_embeds } = await model({ pixel_values: processed.pixel_values });
   const vec = Array.from(image_embeds.data as ArrayLike<number>);
   return normalize(vec);
 };
