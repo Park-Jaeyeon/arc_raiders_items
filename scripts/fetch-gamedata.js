@@ -13,7 +13,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import cheerio from 'cheerio';
+import { load as loadHtml } from 'cheerio';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,7 +56,7 @@ async function downloadIcon(src, name) {
 
 async function scrapeIcons() {
   const html = await fetchHtml(WIKI_ICON_URL);
-  const $ = cheerio.load(html);
+  const $ = loadHtml(html);
   const images = [];
 
   $('img').each((_, el) => {
