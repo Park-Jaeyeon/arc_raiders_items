@@ -1,4 +1,4 @@
-import { env, AutoProcessor, AutoModel } from '@xenova/transformers';
+import { env, pipeline } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
 // Configure Transformers.js to use local models
@@ -7,20 +7,18 @@ env.allowRemoteModels = false;
 env.localModelPath = '/models/'; 
 
 class VisionPipeline {
-  static processor: any = null;
-  static model: any = null;
+  static pipe: any = null;
 
   static async getInstance() {
-    if (!this.processor || !this.model) {
-      console.log('Loading CLIP processor & model (feature-extraction) from local resources...');
-      // Processor는 이미지 -> pixel_values 변환을 담당
-      this.processor = await AutoProcessor.from_pretrained('Xenova/clip-vit-base-patch32');
-      // Model은 image_embeds를 반환하는 CLIP 변형
-      this.model = await AutoModel.from_pretrained('Xenova/clip-vit-base-patch32', {
+    if (!this.pipe) {
+      console.log('Loading CLIP (image-feature-extraction) pipeline from local resources...');
+      this.pipe = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', {
         quantized: true,
+        // @ts-ignore
+        device: 'webgpu',
       });
     }
-    return { processor: this.processor, model: this.model };
+    return this.pipe;
   }
 }
 
@@ -57,13 +55,10 @@ const loadEmbeddings = async () => {
 };
 
 const embedImage = async (image: string | Blob): Promise<number[]> => {
-  const { processor, model } = await VisionPipeline.getInstance();
-  // 1) 이미지 전처리 (pixel_values 생성)
-  const processed = await processor({ images: image }, { return_tensors: 'np' });
-  // 2) 모델 추론 (pixel_values만 전달)
-  const { image_embeds } = await model({ pixel_values: processed.pixel_values });
-  const vec = Array.from(image_embeds.data as ArrayLike<number>);
-  return normalize(vec);
+  const extractor = await VisionPipeline.getInstance();
+  const output = await extractor(image, { pooling: 'mean', normalize: true });
+  const vec = (output?.data as ArrayLike<number>) ?? (Array.isArray(output) ? (output as number[]) : []);
+  return normalize(Array.from(vec));
 };
 
 self.onmessage = async (e) => {
