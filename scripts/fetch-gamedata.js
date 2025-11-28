@@ -18,7 +18,7 @@ import { load as loadHtml } from 'cheerio';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const WIKI_ICON_URL = 'https://arcraiders.wiki.gg/wiki/Category:Item_Icons';
+const WIKI_ICON_URL = process.env.ICON_SOURCE_URL || 'https://arcraiders.wiki.gg/wiki/Category:Item_Icons';
 const META_URL = 'https://raw.githubusercontent.com/Teyk0o/ARDB/main/data/items.json';
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
@@ -36,7 +36,13 @@ async function ensureDirs() {
 }
 
 async function fetchHtml(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: {
+      // wiki.gg는 UA가 없으면 401을 줄 수 있음
+      'User-Agent': 'Mozilla/5.0 (fetch-gamedata-script)',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    },
+  });
   if (!res.ok) throw new Error(`Fetch failed: ${url} (${res.status})`);
   return res.text();
 }
