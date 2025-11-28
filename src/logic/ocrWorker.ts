@@ -11,13 +11,6 @@ const ensureWorker = async () => {
       const worker = await createWorker('eng', 1, {
         logger: (m) => loggerRef?.(m),
       });
-      // createWorker('eng') already loads/initializes, but call explicitly for clarity
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await worker.loadLanguage?.('eng');
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await worker.initialize?.('eng');
       return worker;
     })();
   }

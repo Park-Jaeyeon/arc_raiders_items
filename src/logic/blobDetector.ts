@@ -49,7 +49,7 @@ const findLargestContourBounds = (imageData: ImageData, threshold: number): Rect
     if (ra !== rb) parent[rb] = ra;
   };
 
-  // CCL
+  // CCL (간단한 연결 요소 라벨링)
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const idx = y * width + x;

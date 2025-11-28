@@ -1,4 +1,4 @@
-import { pipeline, env } from '@xenova/transformers';
+import { env, AutoProcessor, AutoModel } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
 // Configure Transformers.js to use local models
@@ -7,30 +7,20 @@ env.allowRemoteModels = false;
 env.localModelPath = '/models/'; 
 
 class VisionPipeline {
-  static instance: any = null;
+  static processor: any = null;
+  static model: any = null;
 
   static async getInstance() {
-    if (!this.instance) {
-      console.log('Loading CLIP (feature-extraction) model from local resources...');
-      
-      try {
-        console.log('Attempting to load with WebGPU...');
-        this.instance = await pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32', {
-          quantized: true,
-          // @ts-ignore
-          device: 'webgpu',
-        } as any);
-        console.log('Success: Model loaded with WebGPU');
-      } catch (e) {
-        console.warn('WebGPU initialization failed, falling back to CPU:', e);
-        this.instance = await pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32', {
-          quantized: true,
-          device: 'cpu',
-        } as any);
-        console.log('Success: Model loaded with CPU');
-      }
+    if (!this.processor || !this.model) {
+      console.log('Loading CLIP processor & model (feature-extraction) from local resources...');
+      // Processor는 이미지 -> pixel_values 변환을 담당
+      this.processor = await AutoProcessor.from_pretrained('Xenova/clip-vit-base-patch32');
+      // Model은 image_embeds를 반환하는 CLIP 변형
+      this.model = await AutoModel.from_pretrained('Xenova/clip-vit-base-patch32', {
+        quantized: true,
+      });
     }
-    return this.instance;
+    return { processor: this.processor, model: this.model };
   }
 }
 
@@ -66,11 +56,14 @@ const loadEmbeddings = async () => {
   return embeddingsPromise;
 };
 
-const embedImage = async (image: string): Promise<number[]> => {
-  const extractor = await VisionPipeline.getInstance();
-  const output = await extractor(image, { pooling: 'mean', normalize: true });
-  const vec = (output?.data as ArrayLike<number>) ?? (Array.isArray(output) ? (output as number[]) : []);
-  return normalize(Array.from(vec));
+const embedImage = async (image: string | Blob): Promise<number[]> => {
+  const { processor, model } = await VisionPipeline.getInstance();
+  // 1) 이미지 전처리 (pixel_values 생성)
+  const inputs = await processor(image, { return_tensors: 'np' });
+  // 2) 모델 추론
+  const { image_embeds } = await model(inputs);
+  const vec = Array.from(image_embeds.data as ArrayLike<number>);
+  return normalize(vec);
 };
 
 self.onmessage = async (e) => {
