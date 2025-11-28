@@ -59,8 +59,9 @@ async function fetchHtml(url) {
   return res.text();
 }
 
-async function downloadIcon(src, name) {
-  const res = await fetch(src);
+async function downloadIcon(src, name, base) {
+  const resolved = src.startsWith('http') ? src : new URL(src, base).toString();
+  const res = await fetch(resolved);
   if (!res.ok) {
     console.warn(`아이콘 다운로드 실패: ${name} (${res.status})`);
     return null;
@@ -74,11 +75,13 @@ async function downloadIcon(src, name) {
 
 async function scrapeIcons() {
   let html = null;
+  let baseUrl = null;
   let lastErr = null;
   for (const url of DEFAULT_ICON_SOURCES) {
     try {
       console.log(`아이콘 페이지 시도: ${url}`);
       html = await fetchHtml(url);
+      baseUrl = new URL(url).origin;
       break;
     } catch (e) {
       lastErr = e;
@@ -98,12 +101,14 @@ async function scrapeIcons() {
     if (!alt || !dataSrc) return;
     // wiki.gg는 썸네일 파라미터가 붙을 수 있으므로 원본 URL로 정리
     const cleanSrc = dataSrc.replace(/\\/g, '').replace(/(\/revision\/latest.*)/, '');
+    // 라이선스 아이콘 등 불필요 이미지 건너뛰기
+    if (cleanSrc.includes('licenses/cc-by') || cleanSrc.includes('wikigg_logo')) return;
     images.push({ name: alt.trim(), src: cleanSrc });
   });
 
   const downloaded = [];
   for (const img of images) {
-    const saved = await downloadIcon(img.src, img.name);
+    const saved = await downloadIcon(img.src, img.name, baseUrl);
     if (saved) downloaded.push(saved);
   }
   return downloaded;
