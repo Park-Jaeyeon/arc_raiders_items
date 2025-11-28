@@ -8,7 +8,7 @@ let workerPromise: Promise<TesseractWorker> | null = null;
 const ensureWorker = async () => {
   if (!workerPromise) {
     workerPromise = (async () => {
-      const worker = await createWorker('eng', {
+      const worker = await createWorker('eng', 1, {
         logger: (m) => loggerRef?.(m),
       });
       // createWorker('eng') already loads/initializes, but call explicitly for clarity
