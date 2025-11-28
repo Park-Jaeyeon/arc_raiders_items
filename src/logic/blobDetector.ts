@@ -113,12 +113,14 @@ const findLargestContourBounds = (imageData: ImageData, threshold: number): Rect
     return { x: 0, y: 0, width, height };
   }
 
+  const l = largest as Rect;
+
   // 안전하게 이미지 경계 안으로 클램프
   return {
-    x: Math.max(0, largest.x),
-    y: Math.max(0, largest.y),
-    width: Math.min(width, largest.x + largest.width) - Math.max(0, largest.x),
-    height: Math.min(height, largest.y + largest.height) - Math.max(0, largest.y),
+    x: Math.max(0, l.x),
+    y: Math.max(0, l.y),
+    width: Math.min(width, l.x + l.width) - Math.max(0, l.x),
+    height: Math.min(height, l.y + l.height) - Math.max(0, l.y),
   };
 };
 
