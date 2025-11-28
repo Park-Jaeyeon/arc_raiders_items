@@ -120,8 +120,7 @@ export const useAiVision = () => {
     // --- 2. Slow Path: AI Vision Model ---
     const worker = getWorker();
     const id = Math.random().toString(36).substring(7);
-    const imageUrl = URL.createObjectURL(imageBlob);
-
+    
     let candidateLabels: string[] = [];
     
     // AI에게 줄 후보군을 OCR 텍스트로 좁힘 (속도 향상)
@@ -142,7 +141,7 @@ export const useAiVision = () => {
       workerPendingPromises.set(id, resolve);
       worker.postMessage({ 
         id, 
-        image: imageUrl,
+        image: imageBlob,
         candidateLabels 
       });
     });
