@@ -18,7 +18,11 @@ import { load as loadHtml } from 'cheerio';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const WIKI_ICON_URL = process.env.ICON_SOURCE_URL || 'https://arcraiders.wiki.gg/wiki/Category:Item_Icons';
+const DEFAULT_ICON_SOURCES = [
+  process.env.ICON_SOURCE_URL,
+  'https://arcraiders.wiki/wiki/Category:Item_Icons',
+  'https://arcraiders.wiki.gg/wiki/Category:Item_Icons',
+].filter(Boolean);
 const ICON_HTML_FILE = process.env.ICON_HTML_FILE; // 로컬에 저장한 HTML 파일 경로
 const ICON_COOKIE = process.env.ICON_COOKIE; // 필요 시 세션 쿠키 전달
 const META_URL = 'https://raw.githubusercontent.com/Teyk0o/ARDB/main/data/items.json';
@@ -69,7 +73,21 @@ async function downloadIcon(src, name) {
 }
 
 async function scrapeIcons() {
-  const html = await fetchHtml(WIKI_ICON_URL);
+  let html = null;
+  let lastErr = null;
+  for (const url of DEFAULT_ICON_SOURCES) {
+    try {
+      console.log(`아이콘 페이지 시도: ${url}`);
+      html = await fetchHtml(url);
+      break;
+    } catch (e) {
+      lastErr = e;
+      console.warn(`아이콘 페이지 실패: ${url} (${e.message})`);
+    }
+  }
+  if (!html) {
+    throw lastErr || new Error('아이콘 페이지를 불러오지 못했습니다.');
+  }
   const $ = loadHtml(html);
   const images = [];
 
