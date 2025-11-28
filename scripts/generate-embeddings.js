@@ -11,7 +11,6 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { pipeline, env } from '@xenova/transformers';
 import fetch, { Response } from 'node-fetch';
-import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +25,18 @@ env.allowLocalModels = true;
 env.localModelPath = path.join(PUBLIC_DIR, 'models');
 // 로컬 모델이 없으면 remote 허용 (필요 시 네트워크)
 env.allowRemoteModels = true;
+// 로컬 파일 접근용 커스텀 fetch 정의
+const customFetch = async (url, options) => {
+  const target = typeof url === 'string' ? url : url?.toString?.() ?? '';
+  if (target.startsWith('file://')) {
+    const filePath = fileURLToPath(target);
+    const buf = await fs.readFile(filePath);
+    return new Response(buf, { status: 200 });
+  }
+  return fetch(url, options);
+};
+env.fetch = customFetch;
+globalThis.fetch = customFetch;
 
 const normalize = (arr) => {
   let norm = 0;
@@ -107,29 +118,8 @@ async function main() {
   const extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', { quantized: true });
 
   const result = {};
-  // 간이 정적 서버로 http://127.0.0.1:<port>/items/... 형태로 접근
-  const server = http.createServer(async (req, res) => {
-    const rel = decodeURIComponent(req.url || '/');
-    const targetPath = path.join(PUBLIC_DIR, rel.replace(/^\/+/, ''));
-    try {
-      const buf = await fs.readFile(targetPath);
-      res.writeHead(200, { 'Content-Type': 'image/png' });
-      res.end(buf);
-    } catch (e) {
-      res.statusCode = 404;
-      res.end('not found');
-    }
-  });
-
-  const port = await new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', () => {
-      const addr = server.address();
-      resolve(addr.port);
-    });
-  });
-
   for (const { name, file } of pairs) {
-    const fileUrl = `http://127.0.0.1:${port}/items/${path.basename(file)}`;
+    const fileUrl = pathToFileURL(file).href;
     const output = await extractor(fileUrl, { pooling: 'mean', normalize: true });
     const vec = Array.from(output.data ?? output);
     result[name] = normalize(vec);
@@ -137,7 +127,6 @@ async function main() {
 
   await fs.writeFile(OUTPUT, JSON.stringify(result, null, 2));
   console.log(`임베딩 저장 완료: ${OUTPUT}`);
-  server.close();
 }
 
 main().catch((err) => {
