@@ -107,7 +107,8 @@ async function main() {
   const result = {};
   for (const { name, file } of pairs) {
     const buffer = await fs.readFile(file);
-    const output = await extractor(buffer, { pooling: 'mean', normalize: true });
+    const dataUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+    const output = await extractor(dataUrl, { pooling: 'mean', normalize: true });
     const vec = Array.from(output.data ?? output);
     result[name] = normalize(vec);
   }
