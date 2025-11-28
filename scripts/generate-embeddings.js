@@ -101,7 +101,8 @@ async function main() {
   }
 
   console.log(`아이템 ${pairs.length}개 임베딩 생성 시작...`);
-  const extractor = await pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32', { quantized: true });
+  // 이미지 입력을 처리하는 전용 파이프라인 사용
+  const extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', { quantized: true });
 
   const result = {};
   for (const { name, file } of pairs) {
