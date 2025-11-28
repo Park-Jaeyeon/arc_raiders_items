@@ -135,445 +135,1347 @@
   },
   "items": {
     "Quick_Use": [
-      { "name": "Adrenaline Shot", "aliases": ["Adrenaline"], "rarity": "uncommon", "mainColor": "#f87171", "weight": 0.25, "maxStack": 5 },
-      { "name": "Agave Juice", "aliases": ["AgaveJuice"] },
-      "Bandage",
-      "Barricade Kit",
-      "Binoculars",
-      "Blaze Grenade",
-      "Blaze Grenade Trap",
-      "Deadline",
-      "Defibrillator",
-      "Door Blocker",
-      "Explosive Mine",
-      "Flame Spray",
-      "Fruit Mix",
-      "Gas Grenade",
-      "Gas Grenade Trap",
-      "Gas Mine",
-      "Heavy Fuze Grenade",
-      "Herbal Bandage",
-      "Integrated Binoculars",
-      "Integrated Shield Recharger",
-      "Jolt Mine",
-      "Li'l Smoke Grenade",
-      "Light Impact Grenade",
-      "Light Stick",
-      "Lure Grenade",
-      "Lure Grenade Trap",
-      "Noisemaker",
-      "Photoelectric Cloak",
-      "Pulse Mine",
-      "Recorder",
-      "Remote Raider Flare",
-      "Seeker Grenade",
-      "Shield Recharger",
-      "Showstopper",
-      "Shrapnel Grenade",
-      "Smoke Grenade",
-      "Smoke Grenade Trap",
-      "Snap Blast Grenade",
-      "Snap Hook",
-      "Sterilized Bandage",
-      "Surge Shield Recharger",
-      "Tagging Grenade",
-      "Trailblazer",
-      "Trigger 'Nade",
-      "Vita Shot",
-      "Vita Spray",
-      "Wolfpack",
-      "Zipline"
+      {
+        "name": "Adrenaline Shot",
+        "aliases": [
+          "Adrenaline"
+        ],
+        "rarity": "uncommon",
+        "mainColor": "#f87171",
+        "weight": 0.25,
+        "maxStack": 5
+      },
+      {
+        "name": "Agave Juice",
+        "aliases": [
+          "AgaveJuice"
+        ]
+      },
+      {
+        "name": "Bandage"
+      },
+      {
+        "name": "Barricade Kit"
+      },
+      {
+        "name": "Binoculars"
+      },
+      {
+        "name": "Blaze Grenade"
+      },
+      {
+        "name": "Blaze Grenade Trap"
+      },
+      {
+        "name": "Deadline"
+      },
+      {
+        "name": "Defibrillator"
+      },
+      {
+        "name": "Door Blocker"
+      },
+      {
+        "name": "Explosive Mine"
+      },
+      {
+        "name": "Flame Spray"
+      },
+      {
+        "name": "Fruit Mix"
+      },
+      {
+        "name": "Gas Grenade"
+      },
+      {
+        "name": "Gas Grenade Trap"
+      },
+      {
+        "name": "Gas Mine"
+      },
+      {
+        "name": "Heavy Fuze Grenade"
+      },
+      {
+        "name": "Herbal Bandage"
+      },
+      {
+        "name": "Integrated Binoculars"
+      },
+      {
+        "name": "Integrated Shield Recharger"
+      },
+      {
+        "name": "Jolt Mine"
+      },
+      {
+        "name": "Li'l Smoke Grenade"
+      },
+      {
+        "name": "Light Impact Grenade"
+      },
+      {
+        "name": "Light Stick"
+      },
+      {
+        "name": "Lure Grenade"
+      },
+      {
+        "name": "Lure Grenade Trap"
+      },
+      {
+        "name": "Noisemaker"
+      },
+      {
+        "name": "Photoelectric Cloak"
+      },
+      {
+        "name": "Pulse Mine"
+      },
+      {
+        "name": "Recorder"
+      },
+      {
+        "name": "Remote Raider Flare"
+      },
+      {
+        "name": "Seeker Grenade"
+      },
+      {
+        "name": "Shield Recharger"
+      },
+      {
+        "name": "Showstopper"
+      },
+      {
+        "name": "Shrapnel Grenade"
+      },
+      {
+        "name": "Smoke Grenade"
+      },
+      {
+        "name": "Smoke Grenade Trap"
+      },
+      {
+        "name": "Snap Blast Grenade"
+      },
+      {
+        "name": "Snap Hook"
+      },
+      {
+        "name": "Sterilized Bandage"
+      },
+      {
+        "name": "Surge Shield Recharger"
+      },
+      {
+        "name": "Tagging Grenade"
+      },
+      {
+        "name": "Trailblazer"
+      },
+      {
+        "name": "Trigger 'Nade"
+      },
+      {
+        "name": "Vita Shot"
+      },
+      {
+        "name": "Vita Spray"
+      },
+      {
+        "name": "Wolfpack"
+      },
+      {
+        "name": "Zipline"
+      }
     ],
     "Ammunition": [
-      "Energy Clip",
-      "Heavy Ammo",
-      "Launcher Ammo",
-      "Light Ammo",
-      "Medium Ammo",
-      "Shotgun Ammo"
+      {
+        "name": "Energy Clip"
+      },
+      {
+        "name": "Heavy Ammo"
+      },
+      {
+        "name": "Launcher Ammo"
+      },
+      {
+        "name": "Light Ammo"
+      },
+      {
+        "name": "Medium Ammo"
+      },
+      {
+        "name": "Shotgun Ammo"
+      }
     ],
     "Modifications": [
-      "Angled Grip I",
-      "Angled Grip II",
-      "Angled Grip III",
-      "Anvil Splitter",
-      "Compensator I",
-      "Compensator II",
-      "Compensator III",
-      "Extended Barrel",
-      "Extended Light Mag I",
-      "Extended Light Mag II",
-      "Extended Light Mag III",
-      "Extended Medium Mag I",
-      "Extended Medium Mag II",
-      "Extended Medium Mag III",
-      "Extended Shotgun Mag I",
-      "Extended Shotgun Mag II",
-      "Extended Shotgun Mag III",
-      "Horizontal Grip",
-      "Kinetic Converter",
-      "Lightweight Stock",
-      "Muzzle Brake I",
-      "Muzzle Brake II",
-      "Muzzle Brake III",
-      "Padded Stock",
-      "Shotgun Choke I",
-      "Shotgun Choke II",
-      "Shotgun Choke III",
-      "Shotgun Silencer",
-      "Silencer I",
-      "Silencer II",
-      "Silencer III",
-      "Stable Stock I",
-      "Stable Stock II",
-      "Stable Stock III",
-      "Vertical Grip I",
-      "Vertical Grip II",
-      "Vertical Grip III"
+      {
+        "name": "Angled Grip I"
+      },
+      {
+        "name": "Angled Grip II"
+      },
+      {
+        "name": "Angled Grip III"
+      },
+      {
+        "name": "Anvil Splitter"
+      },
+      {
+        "name": "Compensator I"
+      },
+      {
+        "name": "Compensator II"
+      },
+      {
+        "name": "Compensator III"
+      },
+      {
+        "name": "Extended Barrel"
+      },
+      {
+        "name": "Extended Light Mag I"
+      },
+      {
+        "name": "Extended Light Mag II"
+      },
+      {
+        "name": "Extended Light Mag III"
+      },
+      {
+        "name": "Extended Medium Mag I"
+      },
+      {
+        "name": "Extended Medium Mag II"
+      },
+      {
+        "name": "Extended Medium Mag III"
+      },
+      {
+        "name": "Extended Shotgun Mag I"
+      },
+      {
+        "name": "Extended Shotgun Mag II"
+      },
+      {
+        "name": "Extended Shotgun Mag III"
+      },
+      {
+        "name": "Horizontal Grip"
+      },
+      {
+        "name": "Kinetic Converter"
+      },
+      {
+        "name": "Lightweight Stock"
+      },
+      {
+        "name": "Muzzle Brake I"
+      },
+      {
+        "name": "Muzzle Brake II"
+      },
+      {
+        "name": "Muzzle Brake III"
+      },
+      {
+        "name": "Padded Stock"
+      },
+      {
+        "name": "Shotgun Choke I"
+      },
+      {
+        "name": "Shotgun Choke II"
+      },
+      {
+        "name": "Shotgun Choke III"
+      },
+      {
+        "name": "Shotgun Silencer"
+      },
+      {
+        "name": "Silencer I"
+      },
+      {
+        "name": "Silencer II"
+      },
+      {
+        "name": "Silencer III"
+      },
+      {
+        "name": "Stable Stock I"
+      },
+      {
+        "name": "Stable Stock II"
+      },
+      {
+        "name": "Stable Stock III"
+      },
+      {
+        "name": "Vertical Grip I"
+      },
+      {
+        "name": "Vertical Grip II"
+      },
+      {
+        "name": "Vertical Grip III"
+      }
     ],
     "Weapons": [
-      "Anvil",
-      "Aphelion",
-      "Arpeggio",
-      "Bettina",
-      "Bobcat",
-      "Burletta",
-      "Equalizer",
-      "Ferro",
-      "Hairpin",
-      "Hullcracker",
-      "Il Toro",
-      "Jupiter",
-      "Kettle",
-      "Osprey",
-      "Rattler",
-      "Renegade",
-      "Stitcher",
-      "Tempest",
-      "Torrente",
-      "Venator",
-      "Vulcano"
+      {
+        "name": "Anvil"
+      },
+      {
+        "name": "Aphelion"
+      },
+      {
+        "name": "Arpeggio"
+      },
+      {
+        "name": "Bettina"
+      },
+      {
+        "name": "Bobcat"
+      },
+      {
+        "name": "Burletta"
+      },
+      {
+        "name": "Equalizer"
+      },
+      {
+        "name": "Ferro"
+      },
+      {
+        "name": "Hairpin"
+      },
+      {
+        "name": "Hullcracker"
+      },
+      {
+        "name": "Il Toro"
+      },
+      {
+        "name": "Jupiter"
+      },
+      {
+        "name": "Kettle"
+      },
+      {
+        "name": "Osprey"
+      },
+      {
+        "name": "Rattler"
+      },
+      {
+        "name": "Renegade"
+      },
+      {
+        "name": "Stitcher"
+      },
+      {
+        "name": "Tempest"
+      },
+      {
+        "name": "Torrente"
+      },
+      {
+        "name": "Venator"
+      },
+      {
+        "name": "Vulcano"
+      }
     ],
     "Shields": [
-      "Heavy Shield",
-      "Light Shield",
-      "Medium Shield"
+      {
+        "name": "Heavy Shield"
+      },
+      {
+        "name": "Light Shield"
+      },
+      {
+        "name": "Medium Shield"
+      }
     ],
     "Augments": [
-      "Combat Mk. 1",
-      "Combat Mk. 2",
-      "Combat Mk. 3 (Aggressive)",
-      "Combat Mk. 3 (Flanking)",
-      "Free Loadout Augment",
-      "Looting Mk. 1",
-      "Looting Mk. 2",
-      "Looting Mk. 3 (Cautious)",
-      "Looting Mk. 3 (Survivor)",
-      "Tactical Mk. 1",
-      "Tactical Mk. 2",
-      "Tactical Mk. 3 (Defensive)",
-      "Tactical Mk. 3 (Healing)"
+      {
+        "name": "Combat Mk. 1"
+      },
+      {
+        "name": "Combat Mk. 2"
+      },
+      {
+        "name": "Combat Mk. 3 (Aggressive)"
+      },
+      {
+        "name": "Combat Mk. 3 (Flanking)"
+      },
+      {
+        "name": "Free Loadout Augment"
+      },
+      {
+        "name": "Looting Mk. 1"
+      },
+      {
+        "name": "Looting Mk. 2"
+      },
+      {
+        "name": "Looting Mk. 3 (Cautious)"
+      },
+      {
+        "name": "Looting Mk. 3 (Survivor)"
+      },
+      {
+        "name": "Tactical Mk. 1"
+      },
+      {
+        "name": "Tactical Mk. 2"
+      },
+      {
+        "name": "Tactical Mk. 3 (Defensive)"
+      },
+      {
+        "name": "Tactical Mk. 3 (Healing)"
+      }
     ],
     "Advanced_Material": [
-      "Mod Components",
-      "Power Rod"
+      {
+        "name": "Mod Components"
+      },
+      {
+        "name": "Power Rod"
+      }
     ],
     "Basic_Material": [
-      "Chemicals",
-      "Fabric",
-      "Metal Parts",
-      "Plastic Parts",
-      "Rubber Parts"
+      {
+        "name": "Chemicals"
+      },
+      {
+        "name": "Fabric"
+      },
+      {
+        "name": "Metal Parts"
+      },
+      {
+        "name": "Plastic Parts"
+      },
+      {
+        "name": "Rubber Parts"
+      }
     ],
     "Key": [
-      "Blue Gate Cellar Key",
-      "Blue Gate Communication Tower Key",
-      "Blue Gate Confiscation Room Key",
-      "Blue Gate Village Key",
-      "Buried City Hospital Key",
-      "Buried City JKV Employee Access Card",
-      "Buried City Residential Mastery Key",
-      "Buried City Town Hall Key",
-      "Dam Control Tower Key",
-      "Dam Staff Room Key",
-      "Dam Surveillance Key",
-      "Dam Testing Annex Key",
-      "Dam Utility Key",
-      "Patrol Car Key",
-      "Raider Hatch Key",
-      "Spaceport Container Storage Key",
-      "Spaceport Control Tower Key",
-      "Spaceport Trench Tower Key",
-      "Spaceport Warehouse Key",
-      "Stella Montis Archives Key",
-      "Stella Montis Assembly Admin Key",
-      "Stella Montis Medical Storage Key",
-      "Stella Montis Security Checkpoint Key"
+      {
+        "name": "Blue Gate Cellar Key"
+      },
+      {
+        "name": "Blue Gate Communication Tower Key"
+      },
+      {
+        "name": "Blue Gate Confiscation Room Key"
+      },
+      {
+        "name": "Blue Gate Village Key"
+      },
+      {
+        "name": "Buried City Hospital Key"
+      },
+      {
+        "name": "Buried City JKV Employee Access Card"
+      },
+      {
+        "name": "Buried City Residential Mastery Key"
+      },
+      {
+        "name": "Buried City Town Hall Key"
+      },
+      {
+        "name": "Dam Control Tower Key"
+      },
+      {
+        "name": "Dam Staff Room Key"
+      },
+      {
+        "name": "Dam Surveillance Key"
+      },
+      {
+        "name": "Dam Testing Annex Key"
+      },
+      {
+        "name": "Dam Utility Key"
+      },
+      {
+        "name": "Patrol Car Key"
+      },
+      {
+        "name": "Raider Hatch Key"
+      },
+      {
+        "name": "Spaceport Container Storage Key"
+      },
+      {
+        "name": "Spaceport Control Tower Key"
+      },
+      {
+        "name": "Spaceport Trench Tower Key"
+      },
+      {
+        "name": "Spaceport Warehouse Key"
+      },
+      {
+        "name": "Stella Montis Archives Key"
+      },
+      {
+        "name": "Stella Montis Assembly Admin Key"
+      },
+      {
+        "name": "Stella Montis Medical Storage Key"
+      },
+      {
+        "name": "Stella Montis Security Checkpoint Key"
+      }
     ],
     "Misc": [
-      "Volcanic Rock"
+      {
+        "name": "Volcanic Rock"
+      }
     ],
     "Nature": [
-      "Agave",
-      "Apricot",
-      "Assorted Seeds",
-      "Fertilizer",
-      "Lemon",
-      "Mushroom",
-      "Olives",
-      "Prickly Pear",
-      "Resin",
-      "Roots"
+      {
+        "name": "Agave"
+      },
+      {
+        "name": "Apricot"
+      },
+      {
+        "name": "Assorted Seeds"
+      },
+      {
+        "name": "Fertilizer"
+      },
+      {
+        "name": "Lemon"
+      },
+      {
+        "name": "Mushroom"
+      },
+      {
+        "name": "Olives"
+      },
+      {
+        "name": "Prickly Pear"
+      },
+      {
+        "name": "Resin"
+      },
+      {
+        "name": "Roots"
+      }
     ],
     "Recyclable": [
-      "Alarm Clock",
-      "ARC Coolant",
-      "ARC Flex Rubber",
-      "ARC Performance Steel",
-      "ARC Synthetic Resin",
-      "ARC Thermo Lining",
-      "Bastion Cell",
-      "Bicycle Pump",
-      "Bombardier Cell",
-      "Broken Flashlight",
-      "Broken Guidance System",
-      "Broken Handheld Radio",
-      "Broken Taser",
-      "Burned ARC Circuitry",
-      "Camera Lens",
-      "Candle Holder",
-      "Coolant",
-      "Cooling Coil",
-      "Cooling Fan",
-      "Cracked Bioscanner",
-      "Crumpled Plastic Bottle",
-      "Damaged ARC Motion Core",
-      "Damaged ARC Powercell",
-      "Damaged Fireball Burner",
-      "Damaged Heat Sink",
-      "Damaged Hornet Driver",
-      "Damaged Rocketeer Driver",
-      "Damaged Snitch Scanner",
-      "Damaged Tick Pod",
-      "Damaged Wasp Driver",
-      "Deflated Football",
-      "Degraded ARC Rubber",
-      "Diving Goggles",
-      "Dog Collar",
-      "Dried-Out ARC Resin",
-      "Expired Respirator",
-      "Fireball Burner",
-      "Flow Controller",
-      "Frequency Modulation Box",
-      "Fried Motherboard",
-      "Frying Pan",
-      "Garlic Press",
-      "Geiger Counter",
-      "Headphones",
-      "Hornet Driver",
-      "Household Cleaner",
-      "Humidifier",
-      "Ice Cream Scooper",
-      "Impure ARC Coolant",
-      "Industrial Battery",
-      "Industrial Charger",
-      "Industrial Magnet",
-      "Ion Sputter",
-      "Laboratory Reagents",
-      "Leaper Pulse Unit",
-      "Magnetron",
-      "Matriarch Reactor",
-      "Metal Brackets",
-      "Microscope",
-      "Mini Centrifuge",
-      "Motor",
-      "Number Plate",
-      "Polluted Air Filter",
-      "Pop Trigger",
-      "Portable TV",
-      "Power Bank",
-      "Power Cable",
-      "Projector",
-      "Queen Reactor",
-      "Radio",
-      "Radio Relay",
-      "Remote Control",
-      "Ripped Safety Vest",
-      "Rocket Thruster",
-      "Rocketeer Driver",
-      "Rotary Encoder",
-      "Rubber Pad",
-      "Ruined Accordion",
-      "Ruined Augment",
-      "Ruined Baton",
-      "Ruined Handcuffs",
-      "Ruined Parachute",
-      "Ruined Riot Shield",
-      "Ruined Tactical Vest",
-      "Rusted Bolts",
-      "Rusted Gear",
-      "Rusted Shut Medical Kit",
-      "Rusted Tools",
-      "Rusty ARC Steel",
-      "Sample Cleaner",
-      "Sentinel Firing Core",
-      "Shredder Gyro",
-      "Signal Amplifier",
-      "Snitch Scanner",
-      "Spectrometer",
-      "Spectrum Analyzer",
-      "Spotter Relay",
-      "Spring Cushion",
-      "Surveyor Vault",
-      "Tattered ARC Lining",
-      "Tattered Clothes",
-      "Telemetry Transceiver",
-      "Thermostat",
-      "Tick Pod",
-      "Toaster",
-      "Torn Blanket",
-      "Turbo Pump",
-      "Unusable Weapon",
-      "Wasp Driver",
-      "Water Filter",
-      "Water Pump"
+      {
+        "name": "Alarm Clock"
+      },
+      {
+        "name": "ARC Coolant"
+      },
+      {
+        "name": "ARC Flex Rubber"
+      },
+      {
+        "name": "ARC Performance Steel"
+      },
+      {
+        "name": "ARC Synthetic Resin"
+      },
+      {
+        "name": "ARC Thermo Lining"
+      },
+      {
+        "name": "Bastion Cell"
+      },
+      {
+        "name": "Bicycle Pump"
+      },
+      {
+        "name": "Bombardier Cell"
+      },
+      {
+        "name": "Broken Flashlight"
+      },
+      {
+        "name": "Broken Guidance System"
+      },
+      {
+        "name": "Broken Handheld Radio"
+      },
+      {
+        "name": "Broken Taser"
+      },
+      {
+        "name": "Burned ARC Circuitry"
+      },
+      {
+        "name": "Camera Lens"
+      },
+      {
+        "name": "Candle Holder"
+      },
+      {
+        "name": "Coolant"
+      },
+      {
+        "name": "Cooling Coil"
+      },
+      {
+        "name": "Cooling Fan"
+      },
+      {
+        "name": "Cracked Bioscanner"
+      },
+      {
+        "name": "Crumpled Plastic Bottle"
+      },
+      {
+        "name": "Damaged ARC Motion Core"
+      },
+      {
+        "name": "Damaged ARC Powercell"
+      },
+      {
+        "name": "Damaged Fireball Burner"
+      },
+      {
+        "name": "Damaged Heat Sink"
+      },
+      {
+        "name": "Damaged Hornet Driver"
+      },
+      {
+        "name": "Damaged Rocketeer Driver"
+      },
+      {
+        "name": "Damaged Snitch Scanner"
+      },
+      {
+        "name": "Damaged Tick Pod"
+      },
+      {
+        "name": "Damaged Wasp Driver"
+      },
+      {
+        "name": "Deflated Football"
+      },
+      {
+        "name": "Degraded ARC Rubber"
+      },
+      {
+        "name": "Diving Goggles"
+      },
+      {
+        "name": "Dog Collar"
+      },
+      {
+        "name": "Dried-Out ARC Resin"
+      },
+      {
+        "name": "Expired Respirator"
+      },
+      {
+        "name": "Fireball Burner"
+      },
+      {
+        "name": "Flow Controller"
+      },
+      {
+        "name": "Frequency Modulation Box"
+      },
+      {
+        "name": "Fried Motherboard"
+      },
+      {
+        "name": "Frying Pan"
+      },
+      {
+        "name": "Garlic Press"
+      },
+      {
+        "name": "Geiger Counter"
+      },
+      {
+        "name": "Headphones"
+      },
+      {
+        "name": "Hornet Driver"
+      },
+      {
+        "name": "Household Cleaner"
+      },
+      {
+        "name": "Humidifier"
+      },
+      {
+        "name": "Ice Cream Scooper"
+      },
+      {
+        "name": "Impure ARC Coolant"
+      },
+      {
+        "name": "Industrial Battery"
+      },
+      {
+        "name": "Industrial Charger"
+      },
+      {
+        "name": "Industrial Magnet"
+      },
+      {
+        "name": "Ion Sputter"
+      },
+      {
+        "name": "Laboratory Reagents"
+      },
+      {
+        "name": "Leaper Pulse Unit"
+      },
+      {
+        "name": "Magnetron"
+      },
+      {
+        "name": "Matriarch Reactor"
+      },
+      {
+        "name": "Metal Brackets"
+      },
+      {
+        "name": "Microscope"
+      },
+      {
+        "name": "Mini Centrifuge"
+      },
+      {
+        "name": "Motor"
+      },
+      {
+        "name": "Number Plate"
+      },
+      {
+        "name": "Polluted Air Filter"
+      },
+      {
+        "name": "Pop Trigger"
+      },
+      {
+        "name": "Portable TV"
+      },
+      {
+        "name": "Power Bank"
+      },
+      {
+        "name": "Power Cable"
+      },
+      {
+        "name": "Projector"
+      },
+      {
+        "name": "Queen Reactor"
+      },
+      {
+        "name": "Radio"
+      },
+      {
+        "name": "Radio Relay"
+      },
+      {
+        "name": "Remote Control"
+      },
+      {
+        "name": "Ripped Safety Vest"
+      },
+      {
+        "name": "Rocket Thruster"
+      },
+      {
+        "name": "Rocketeer Driver"
+      },
+      {
+        "name": "Rotary Encoder"
+      },
+      {
+        "name": "Rubber Pad"
+      },
+      {
+        "name": "Ruined Accordion"
+      },
+      {
+        "name": "Ruined Augment"
+      },
+      {
+        "name": "Ruined Baton"
+      },
+      {
+        "name": "Ruined Handcuffs"
+      },
+      {
+        "name": "Ruined Parachute"
+      },
+      {
+        "name": "Ruined Riot Shield"
+      },
+      {
+        "name": "Ruined Tactical Vest"
+      },
+      {
+        "name": "Rusted Bolts"
+      },
+      {
+        "name": "Rusted Gear"
+      },
+      {
+        "name": "Rusted Shut Medical Kit"
+      },
+      {
+        "name": "Rusted Tools"
+      },
+      {
+        "name": "Rusty ARC Steel"
+      },
+      {
+        "name": "Sample Cleaner"
+      },
+      {
+        "name": "Sentinel Firing Core"
+      },
+      {
+        "name": "Shredder Gyro"
+      },
+      {
+        "name": "Signal Amplifier"
+      },
+      {
+        "name": "Snitch Scanner"
+      },
+      {
+        "name": "Spectrometer"
+      },
+      {
+        "name": "Spectrum Analyzer"
+      },
+      {
+        "name": "Spotter Relay"
+      },
+      {
+        "name": "Spring Cushion"
+      },
+      {
+        "name": "Surveyor Vault"
+      },
+      {
+        "name": "Tattered ARC Lining"
+      },
+      {
+        "name": "Tattered Clothes"
+      },
+      {
+        "name": "Telemetry Transceiver"
+      },
+      {
+        "name": "Thermostat"
+      },
+      {
+        "name": "Tick Pod"
+      },
+      {
+        "name": "Toaster"
+      },
+      {
+        "name": "Torn Blanket"
+      },
+      {
+        "name": "Turbo Pump"
+      },
+      {
+        "name": "Unusable Weapon"
+      },
+      {
+        "name": "Wasp Driver"
+      },
+      {
+        "name": "Water Filter"
+      },
+      {
+        "name": "Water Pump"
+      }
     ],
     "Refined_Material": [
-      "Advanced Electrical Components",
-      "Advanced Mechanical Components",
-      "Antiseptic",
-      "Crude Explosives",
-      "Durable Cloth",
-      "Electrical Components",
-      "Explosive Compound",
-      "Magnetic Accelerator",
-      "Mechanical Components"
+      {
+        "name": "Advanced Electrical Components"
+      },
+      {
+        "name": "Advanced Mechanical Components"
+      },
+      {
+        "name": "Antiseptic"
+      },
+      {
+        "name": "Crude Explosives"
+      },
+      {
+        "name": "Durable Cloth"
+      },
+      {
+        "name": "Electrical Components"
+      },
+      {
+        "name": "Explosive Compound"
+      },
+      {
+        "name": "Magnetic Accelerator"
+      },
+      {
+        "name": "Mechanical Components"
+      }
     ],
     "Topside_Material": [
-      "Advanced ARC Powercell",
-      "ARC Alloy",
-      "ARC Circuitry",
-      "ARC Motion Core",
-      "ARC Powercell",
-      "Battery",
-      "Canister",
-      "Complex Gun Parts",
-      "Duct Tape",
-      "Exodus Modules",
-      "Great Mullein",
-      "Heavy Gun Parts",
-      "Light Gun Parts",
-      "Magnet",
-      "Medium Gun Parts",
-      "Moss",
-      "Oil",
-      "Processor",
-      "Rope",
-      "Sensors",
-      "Simple Gun Parts",
-      "Speaker Component",
-      "Steel Spring",
-      "Synthesized Fuel",
-      "Syringe",
-      "Voltage Converter",
-      "Wires"
+      {
+        "name": "Advanced ARC Powercell"
+      },
+      {
+        "name": "ARC Alloy"
+      },
+      {
+        "name": "ARC Circuitry"
+      },
+      {
+        "name": "ARC Motion Core"
+      },
+      {
+        "name": "ARC Powercell"
+      },
+      {
+        "name": "Battery"
+      },
+      {
+        "name": "Canister"
+      },
+      {
+        "name": "Complex Gun Parts"
+      },
+      {
+        "name": "Duct Tape"
+      },
+      {
+        "name": "Exodus Modules"
+      },
+      {
+        "name": "Great Mullein"
+      },
+      {
+        "name": "Heavy Gun Parts"
+      },
+      {
+        "name": "Light Gun Parts"
+      },
+      {
+        "name": "Magnet"
+      },
+      {
+        "name": "Medium Gun Parts"
+      },
+      {
+        "name": "Moss"
+      },
+      {
+        "name": "Oil"
+      },
+      {
+        "name": "Processor"
+      },
+      {
+        "name": "Rope"
+      },
+      {
+        "name": "Sensors"
+      },
+      {
+        "name": "Simple Gun Parts"
+      },
+      {
+        "name": "Speaker Component"
+      },
+      {
+        "name": "Steel Spring"
+      },
+      {
+        "name": "Synthesized Fuel"
+      },
+      {
+        "name": "Syringe"
+      },
+      {
+        "name": "Voltage Converter"
+      },
+      {
+        "name": "Wires"
+      }
     ],
     "Trinket": [
-      "Air Freshener",
-      "Bloated Tuna Can",
-      "Breathtaking Snow Globe",
-      "Cat Bed",
-      "Coffee Pot",
-      "Dart Board",
-      "Empty Wine Bottle",
-      "Expired Pasta",
-      "Faded Photograph",
-      "Film Reel",
-      "Fine Wristwatch",
-      "Lance's Mixtape (5th Edition)",
-      "Light Bulb",
-      "Music Album",
-      "Music Box",
-      "Painted Box",
-      "Playing Cards",
-      "Poster Of Natural Wonders",
-      "Pottery",
-      "Red Coral Jewelry",
-      "Rosary",
-      "Rubber Duck",
-      "Silver Teaspoon Set",
-      "Statuette",
-      "Torn Book",
-      "Vase",
-      "Very Comfortable Pillow"
+      {
+        "name": "Air Freshener"
+      },
+      {
+        "name": "Bloated Tuna Can"
+      },
+      {
+        "name": "Breathtaking Snow Globe"
+      },
+      {
+        "name": "Cat Bed"
+      },
+      {
+        "name": "Coffee Pot"
+      },
+      {
+        "name": "Dart Board"
+      },
+      {
+        "name": "Empty Wine Bottle"
+      },
+      {
+        "name": "Expired Pasta"
+      },
+      {
+        "name": "Faded Photograph"
+      },
+      {
+        "name": "Film Reel"
+      },
+      {
+        "name": "Fine Wristwatch"
+      },
+      {
+        "name": "Lance's Mixtape (5th Edition)"
+      },
+      {
+        "name": "Light Bulb"
+      },
+      {
+        "name": "Music Album"
+      },
+      {
+        "name": "Music Box"
+      },
+      {
+        "name": "Painted Box"
+      },
+      {
+        "name": "Playing Cards"
+      },
+      {
+        "name": "Poster Of Natural Wonders"
+      },
+      {
+        "name": "Pottery"
+      },
+      {
+        "name": "Red Coral Jewelry"
+      },
+      {
+        "name": "Rosary"
+      },
+      {
+        "name": "Rubber Duck"
+      },
+      {
+        "name": "Silver Teaspoon Set"
+      },
+      {
+        "name": "Statuette"
+      },
+      {
+        "name": "Torn Book"
+      },
+      {
+        "name": "Vase"
+      },
+      {
+        "name": "Very Comfortable Pillow"
+      }
     ]
   },
   "overrides": {
-    "Mechanical Components": { "defaultKeepMin": 50, "usedForCrafting": true, "weight": 1.0 },
-    "Metal Parts": { "defaultKeepMin": 100, "usedForCrafting": true, "weight": 0.8 },
-    "Rubber Parts": { "defaultKeepMin": 50, "usedForCrafting": true, "weight": 0.6 },
-    "Fabric": { "defaultKeepMin": 50, "usedForCrafting": true, "weight": 0.4 },
-    "Electrical Components": { "defaultKeepMin": 50, "usedForCrafting": true, "weight": 0.9 },
-    "ARC Alloy": { "defaultKeepMin": 20, "usedForCrafting": true },
-    "Advanced Mechanical Components": { "defaultKeepMin": 20, "usedForCrafting": true },
-    "Laboratory Reagents": { "defaultKeepMin": 20, "usedForCrafting": true, "category": "material" },
-    "Queen Reactor": { "defaultKeepMin": 1, "usedForCrafting": true, "category": "material" },
-    "ARC Circuitry": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "ARC Motion Core": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "Heavy Gun Parts": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "Light Gun Parts": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "Medium Gun Parts": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "Complex Gun Parts": { "defaultKeepMin": 10, "usedForCrafting": true },
-    "Antiseptic": { "defaultKeepMin": 10, "usedForQuests": true },
-    "Battery": { "defaultKeepMin": 5, "usedForQuests": true, "category": "material" },
-    "Canister": { "defaultKeepMin": 20, "usedForCrafting": true },
-    "Chemicals": { "defaultKeepMin": 20, "usedForCrafting": true },
-    "Durable Cloth": { "defaultKeepMin": 20, "usedForQuests": true, "usedForCrafting": true },
-    "Explosive Compound": { "defaultKeepMin": 20, "usedForCrafting": true },
-    "Fertilizer": { "defaultKeepMin": 20, "usedForQuests": true },
-    "Fireball Burner": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Great Mullein": { "defaultKeepMin": 10, "usedForQuests": true },
-    "Hornet Driver": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Leaper Pulse Unit": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Power Rod": { "defaultKeepMin": 10, "usedForQuests": true },
-    "Rocketeer Driver": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Sentinel Firing Core": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Snitch Scanner": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Surveyor Vault": { "defaultKeepMin": 3, "usedForQuests": true },
-    "Syringe": { "defaultKeepMin": 10, "usedForQuests": true },
-    "Tick Pod": { "defaultKeepMin": 10, "usedForQuests": true },
-    "Wasp Driver": { "defaultKeepMin": 5, "usedForQuests": true },
-    "Water Pump": { "defaultKeepMin": 2, "usedForQuests": true },
-    "Wires": { "defaultKeepMin": 20, "usedForQuests": true },
-    "Agave": { "defaultKeepMin": 0, "category": "misc" },
-    "Air Freshener": { "defaultKeepMin": 0, "category": "misc" },
-    "Alarm Clock": { "defaultKeepMin": 0, "category": "misc" },
-    "ARC Coolant": { "defaultKeepMin": 0, "category": "misc" },
-    "ARC Flex Rubber": { "defaultKeepMin": 0, "category": "misc" },
-    "ARC Performance Steel": { "defaultKeepMin": 0, "category": "misc" },
-    "Advanced ARC Powercell": { "defaultKeepMin": 5, "category": "material" },
-    "Adrenaline Shot": { "defaultKeepMin": 5, "aliases": ["Adrenaline"], "rarity": "uncommon" },
-    "Agave Juice": { "defaultKeepMin": 5 },
-    "Bandage": { "defaultKeepMin": 20, "aliases": ["Band aid"] },
-    "Herbal Bandage": { "defaultKeepMin": 10 },
-    "Sterilized Bandage": { "defaultKeepMin": 10 },
-    "Fruit Mix": { "defaultKeepMin": 5 },
-    "Vita Shot": { "defaultKeepMin": 5 },
-    "Vita Spray": { "defaultKeepMin": 5 },
-    "Blaze Grenade": { "defaultKeepMin": 5, "category": "weapon" },
-    "Gas Grenade": { "defaultKeepMin": 5, "category": "weapon" },
-    "Smoke Grenade": { "defaultKeepMin": 5, "category": "weapon" },
-    "Lure Grenade": { "defaultKeepMin": 5, "category": "weapon" },
-    "Explosive Mine": { "defaultKeepMin": 5, "category": "weapon" },
-    "Apricot": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Cat Bed": { "defaultKeepMin": 1, "usedForWorkshop": true },
-    "Dog Collar": { "defaultKeepMin": 1, "usedForWorkshop": true },
-    "Lemon": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Mushroom": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Olives": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Prickly Pear": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Very Comfortable Pillow": { "defaultKeepMin": 1, "usedForWorkshop": true },
-    "Light Bulb": { "defaultKeepMin": 5, "usedForWorkshop": true },
-    "Cooling Fan": { "defaultKeepMin": 5, "usedForWorkshop": true }
+    "Mechanical Components": {
+      "defaultKeepMin": 50,
+      "usedForCrafting": true,
+      "weight": 1
+    },
+    "Metal Parts": {
+      "defaultKeepMin": 100,
+      "usedForCrafting": true,
+      "weight": 0.8
+    },
+    "Rubber Parts": {
+      "defaultKeepMin": 50,
+      "usedForCrafting": true,
+      "weight": 0.6
+    },
+    "Fabric": {
+      "defaultKeepMin": 50,
+      "usedForCrafting": true,
+      "weight": 0.4
+    },
+    "Electrical Components": {
+      "defaultKeepMin": 50,
+      "usedForCrafting": true,
+      "weight": 0.9
+    },
+    "ARC Alloy": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true
+    },
+    "Advanced Mechanical Components": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true
+    },
+    "Laboratory Reagents": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true,
+      "category": "material"
+    },
+    "Queen Reactor": {
+      "defaultKeepMin": 1,
+      "usedForCrafting": true,
+      "category": "material"
+    },
+    "ARC Circuitry": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "ARC Motion Core": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "Heavy Gun Parts": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "Light Gun Parts": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "Medium Gun Parts": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "Complex Gun Parts": {
+      "defaultKeepMin": 10,
+      "usedForCrafting": true
+    },
+    "Antiseptic": {
+      "defaultKeepMin": 10,
+      "usedForQuests": true
+    },
+    "Battery": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true,
+      "category": "material"
+    },
+    "Canister": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true
+    },
+    "Chemicals": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true
+    },
+    "Durable Cloth": {
+      "defaultKeepMin": 20,
+      "usedForQuests": true,
+      "usedForCrafting": true
+    },
+    "Explosive Compound": {
+      "defaultKeepMin": 20,
+      "usedForCrafting": true
+    },
+    "Fertilizer": {
+      "defaultKeepMin": 20,
+      "usedForQuests": true
+    },
+    "Fireball Burner": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Great Mullein": {
+      "defaultKeepMin": 10,
+      "usedForQuests": true
+    },
+    "Hornet Driver": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Leaper Pulse Unit": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Power Rod": {
+      "defaultKeepMin": 10,
+      "usedForQuests": true
+    },
+    "Rocketeer Driver": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Sentinel Firing Core": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Snitch Scanner": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Surveyor Vault": {
+      "defaultKeepMin": 3,
+      "usedForQuests": true
+    },
+    "Syringe": {
+      "defaultKeepMin": 10,
+      "usedForQuests": true
+    },
+    "Tick Pod": {
+      "defaultKeepMin": 10,
+      "usedForQuests": true
+    },
+    "Wasp Driver": {
+      "defaultKeepMin": 5,
+      "usedForQuests": true
+    },
+    "Water Pump": {
+      "defaultKeepMin": 2,
+      "usedForQuests": true
+    },
+    "Wires": {
+      "defaultKeepMin": 20,
+      "usedForQuests": true
+    },
+    "Agave": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "Air Freshener": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "Alarm Clock": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "ARC Coolant": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "ARC Flex Rubber": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "ARC Performance Steel": {
+      "defaultKeepMin": 0,
+      "category": "misc"
+    },
+    "Advanced ARC Powercell": {
+      "defaultKeepMin": 5,
+      "category": "material"
+    },
+    "Adrenaline Shot": {
+      "defaultKeepMin": 5,
+      "aliases": [
+        "Adrenaline"
+      ],
+      "rarity": "uncommon"
+    },
+    "Agave Juice": {
+      "defaultKeepMin": 5
+    },
+    "Bandage": {
+      "defaultKeepMin": 20,
+      "aliases": [
+        "Band aid"
+      ]
+    },
+    "Herbal Bandage": {
+      "defaultKeepMin": 10
+    },
+    "Sterilized Bandage": {
+      "defaultKeepMin": 10
+    },
+    "Fruit Mix": {
+      "defaultKeepMin": 5
+    },
+    "Vita Shot": {
+      "defaultKeepMin": 5
+    },
+    "Vita Spray": {
+      "defaultKeepMin": 5
+    },
+    "Blaze Grenade": {
+      "defaultKeepMin": 5,
+      "category": "weapon"
+    },
+    "Gas Grenade": {
+      "defaultKeepMin": 5,
+      "category": "weapon"
+    },
+    "Smoke Grenade": {
+      "defaultKeepMin": 5,
+      "category": "weapon"
+    },
+    "Lure Grenade": {
+      "defaultKeepMin": 5,
+      "category": "weapon"
+    },
+    "Explosive Mine": {
+      "defaultKeepMin": 5,
+      "category": "weapon"
+    },
+    "Apricot": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Cat Bed": {
+      "defaultKeepMin": 1,
+      "usedForWorkshop": true
+    },
+    "Dog Collar": {
+      "defaultKeepMin": 1,
+      "usedForWorkshop": true
+    },
+    "Lemon": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Mushroom": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Olives": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Prickly Pear": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Very Comfortable Pillow": {
+      "defaultKeepMin": 1,
+      "usedForWorkshop": true
+    },
+    "Light Bulb": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    },
+    "Cooling Fan": {
+      "defaultKeepMin": 5,
+      "usedForWorkshop": true
+    }
   }
 }

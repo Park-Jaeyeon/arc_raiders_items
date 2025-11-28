@@ -25,3 +25,10 @@ dist-ssr
 
 # Large AI Models
 public/models
+
+# Generated assets
+cache/
+public/items/
+public/embeddings.json
+public/icons-map.json
+.cache
