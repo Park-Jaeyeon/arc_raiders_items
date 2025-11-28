@@ -60,9 +60,9 @@ const loadEmbeddings = async () => {
 
 const embedImage = async (image: string | Blob): Promise<number[]> => {
   const { processor, model } = await VisionPipeline.getInstance();
-  // processor가 pixel_values 텐서를 생성 (기본 return_tensors 사용)
-  const inputs = await processor(image);
-  const { image_embeds } = await model(inputs);
+  // 문자열 URL이 텍스트로 처리되지 않도록 명시적으로 images 키를 사용
+  const inputs = await processor({ images: image }, { return_tensors: 'pt' });
+  const { image_embeds } = await model({ pixel_values: inputs.pixel_values });
   const vec = Array.from(image_embeds.data as ArrayLike<number>);
   return normalize(vec);
 };
