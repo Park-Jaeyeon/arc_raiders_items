@@ -23,12 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Large AI Models
-public/models
-
-# Generated assets
-cache/
+# Generated Assets & Data
+public/models/
 public/items/
 public/embeddings.json
 public/icons-map.json
-.cache
+
+# Tool config
+.gemini/
+
+
