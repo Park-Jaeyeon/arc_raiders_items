@@ -12,7 +12,7 @@ class VisionPipeline {
   static async getInstance() {
     if (!this.pipePromise) {
       console.log('Loading CLIP image-feature-extraction pipeline (Xenova/clip-vit-base-patch32)...');
-      this.pipePromise = pipeline('image-feature-extraction', 'clip-vit-base-patch32', {
+      this.pipePromise = pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', {
         quantized: true,
       });
     }
