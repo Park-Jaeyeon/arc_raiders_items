@@ -1,6 +1,8 @@
 import { env, pipeline, RawImage } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
+const MODEL_ID = 'Xenova/clip-vit-base-patch32-vision';
+
 // Configure Transformers.js to use local models
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
@@ -12,9 +14,9 @@ class VisionPipeline {
 
   static async getInstance() {
     if (!this.pipePromise) {
-      console.log('Loading CLIP image-feature-extraction pipeline (Xenova/clip-vit-base-patch32)...');
+      console.log(`Loading CLIP vision pipeline (${MODEL_ID})...`);
       
-      this.pipePromise = pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', {
+      this.pipePromise = pipeline('image-feature-extraction', MODEL_ID, {
         quantized: true,
       });
     }

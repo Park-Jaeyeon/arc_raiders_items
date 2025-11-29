@@ -3,22 +3,24 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const MODEL_ID = 'Xenova/clip-vit-base-patch32';
-const OUTPUT_DIR = path.resolve(__dirname, '../public/models/clip-vit-base-patch32');
+const MODEL_ID = 'Xenova/clip-vit-base-patch32-vision';
+const OUTPUT_DIR = path.resolve(__dirname, `../public/models/${MODEL_ID}`);
 
 // 다운로드할 파일 매핑 (Source -> Destination)
 const FILES = {
   'config.json': 'config.json',
   'preprocessor_config.json': 'preprocessor_config.json',
-  'tokenizer.json': 'tokenizer.json',
-  'tokenizer_config.json': 'tokenizer_config.json',
   // 중요: HuggingFace 경로 -> 로컬 저장 이름
-  'onnx/model_quantized.onnx': 'model_quantized.onnx' 
+  'onnx/model_quantized.onnx': 'onnx/model_quantized.onnx' 
 };
 
 async function downloadFile(remotePath, localName) {
   const url = `https://huggingface.co/${MODEL_ID}/resolve/main/${remotePath}`;
   const dest = path.join(OUTPUT_DIR, localName);
+  const dir = path.dirname(dest);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   
   console.log(`Downloading ${remotePath} -> ${localName}...`);
   

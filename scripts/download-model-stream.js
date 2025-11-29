@@ -4,14 +4,12 @@ import https from 'https';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const MODEL_ID = 'Xenova/clip-vit-base-patch32';
+const MODEL_ID = 'Xenova/clip-vit-base-patch32-vision';
 const OUTPUT_DIR = path.resolve(__dirname, `../public/models/${MODEL_ID}`);
 
 const FILES = {
   'config.json': 'config.json',
   'preprocessor_config.json': 'preprocessor_config.json',
-  'tokenizer.json': 'tokenizer.json',
-  'tokenizer_config.json': 'tokenizer_config.json',
   'onnx/model_quantized.onnx': 'onnx/model_quantized.onnx'
 };
 

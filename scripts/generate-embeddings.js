@@ -25,6 +25,7 @@ env.allowLocalModels = true;
 env.localModelPath = path.join(PUBLIC_DIR, 'models');
 // 로컬 모델이 없으면 remote 허용 (필요 시 네트워크)
 env.allowRemoteModels = true;
+const MODEL_ID = 'Xenova/clip-vit-base-patch32-vision';
 // 로컬 파일 접근용 커스텀 fetch 정의
 const customFetch = async (url, options) => {
   const target = typeof url === 'string' ? url : url?.toString?.() ?? '';
@@ -117,7 +118,7 @@ async function main() {
 
   console.log(`아이템 ${pairs.length}개 임베딩 생성 시작...`);
   // 이미지 입력을 처리하는 전용 파이프라인 사용
-  const extractor = await pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', { quantized: true });
+  const extractor = await pipeline('image-feature-extraction', MODEL_ID, { quantized: true });
 
   const result = {};
   for (const { name, file } of pairs) {
