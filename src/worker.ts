@@ -4,7 +4,8 @@ import { ITEMS } from './data/items';
 // Configure Transformers.js to use local models
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
-// env.localModelPath = '/models/'; 
+env.localModelPath = '/models/';
+env.useBrowserCache = false;
 
 class VisionPipeline {
   static pipePromise: Promise<any> | null = null;
@@ -12,8 +13,7 @@ class VisionPipeline {
   static async getInstance() {
     if (!this.pipePromise) {
       console.log('Loading CLIP image-feature-extraction pipeline (Xenova/clip-vit-base-patch32)...');
-      // Use explicit path to avoid resolution errors
-      this.pipePromise = pipeline('image-feature-extraction', '/models/Xenova/clip-vit-base-patch32', {
+      this.pipePromise = pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', {
         quantized: true,
       });
     }

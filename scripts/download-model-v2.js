@@ -4,13 +4,15 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MODEL_ID = 'Xenova/clip-vit-base-patch32';
-const OUTPUT_DIR = path.resolve(__dirname, '../public/models/clip-vit-base-patch32');
+const OUTPUT_DIR = path.resolve(__dirname, '../public/models/Xenova/clip-vit-base-patch32');
 
 const FILES = {
   'config.json': 'config.json',
   'preprocessor_config.json': 'preprocessor_config.json',
   'tokenizer.json': 'tokenizer.json',
   'tokenizer_config.json': 'tokenizer_config.json',
+  'vocab.json': 'vocab.json',
+  'merges.txt': 'merges.txt',
   'onnx/model_quantized.onnx': 'onnx/model_quantized.onnx' 
 };
 
