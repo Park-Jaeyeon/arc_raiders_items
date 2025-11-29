@@ -23,11 +23,12 @@
     "tesseract.js": "^5.0.5"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0-alpha.0",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@vitejs/plugin-react": "^4.2.1",
-    "tailwindcss": "^4.0.0-alpha.0",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
   },
