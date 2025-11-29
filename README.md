@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# ARC Raiders Inventory Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ARC Raiders 게임의 인벤토리를 관리하고, 스크린샷을 통해 아이템을 자동으로 인식하는 웹 애플리케이션입니다.
 
-Currently, two official plugins are available:
+## 주요 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **아이템 데이터베이스**: 게임 내 아이템 정보를 조회하고 관리합니다.
+*   **AI 비전 인식 (Image Recognition)**: 인벤토리 스크린샷을 업로드하면 CLIP 모델을 사용하여 아이템을 자동으로 식별합니다.
+*   **OCR (광학 문자 인식)**: 텍스트 인식을 통해 수량 등을 파악합니다.
 
-## React Compiler
+## 시작하기
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+이 프로젝트를 실행하기 위해서는 Node.js 환경이 필요합니다.
 
-## Expanding the ESLint configuration
+### 설치 및 설정 단계
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+프로젝트를 처음 시작할 때 다음 단계들을 순서대로 실행해주세요.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1.  **패키지 설치**
+    ```bash
+    npm install
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2.  **AI 모델 다운로드**
+    이미지 분석에 사용되는 `Xenova/clip-vit-base-patch32` 모델을 로컬로 다운로드합니다.
+    ```bash
+    npm run download-model
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+3.  **게임 데이터 및 아이콘 동기화**
+    외부 위키 및 데이터베이스에서 최신 아이템 정보와 아이콘 이미지를 가져옵니다.
+    ```bash
+    npm run fetch:gamedata
+    ```
+
+4.  **AI 임베딩 데이터 생성**
+    다운로드한 아이콘 이미지들을 분석하여 AI가 인식할 수 있는 벡터 데이터(`embeddings.json`)를 생성합니다.
+    *이 단계가 선행되어야 이미지 인식이 작동합니다.*
+    ```bash
+    npm run embed:generate
+    ```
+
+### 개발 서버 실행
+
+설정이 완료되면 다음 명령어로 개발 서버를 실행하세요.
+
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+브라우저에서 `http://localhost:5173` (또는 터미널에 표시된 주소)으로 접속하여 애플리케이션을 사용할 수 있습니다.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 트러블슈팅
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+*   **페이지 접속 시 "Worker Init Error" 또는 모델 관련 에러가 발생하는 경우:**
+    `npm run download-model` 명령어를 실행하여 모델 파일이 `public/models` 폴더에 제대로 다운로드되었는지 확인해주세요.
+
+*   **아이템 인식이 전혀 되지 않는 경우:**
+    `npm run embed:generate` 명령어를 실행하여 `public/embeddings.json` 파일이 생성되었는지 확인해주세요.
+
+*   **아이콘 이미지가 보이지 않는 경우:**
+    `npm run fetch:gamedata` 명령어를 통해 아이콘을 다운로드해주세요.
+
+## 기술 스택
+
+*   React + TypeScript
+*   Vite
+*   Transformers.js (AI Vision)
+*   Tesseract.js (OCR)
+*   Tailwind CSS
