@@ -56,16 +56,25 @@ function App() {
 
     // 1. Prepare all blob data first
     const preparePromises = blobs.map(async (blob) => {
+      // Inner Crop Logic: Crop 12% from each side to remove slot borders
+      const cropX = blob.width * 0.12;
+      const cropY = blob.height * 0.12;
+      const cropW = blob.width - cropX * 2;
+      const cropH = blob.height - cropY * 2;
+
       const itemCanvas = document.createElement('canvas');
-      itemCanvas.width = blob.width;
-      itemCanvas.height = blob.height;
+      itemCanvas.width = cropW;
+      itemCanvas.height = cropH;
       const itemCtx = itemCanvas.getContext('2d')!;
+      
+      // Draw only the center part of the slot
       itemCtx.drawImage(
         canvas, 
-        blob.x, blob.y, blob.width, blob.height,
-        0, 0, blob.width, blob.height
+        blob.x + cropX, blob.y + cropY, cropW, cropH,
+        0, 0, cropW, cropH
       );
 
+      // For OCR search, we still use the original blob area
       const searchMarginBottom = blob.height * 0.6;
       const matchedWords = ocrWords.filter((w: any) => {
         const wx = (w.bbox.x0 + w.bbox.x1) / 2;

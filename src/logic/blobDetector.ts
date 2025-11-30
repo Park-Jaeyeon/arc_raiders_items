@@ -134,8 +134,9 @@ const findBestBounds = (imageData: ImageData): Rect => {
 const sliceIntoGrid = (bounds: Rect): Rect[] => {
   const cellW = bounds.width / COLS;
   const cellH = bounds.height / ROWS;
-  const insetX = Math.min(PADDING_PX, cellW / 4);
-  const insetY = Math.min(PADDING_PX, cellH / 4);
+  // Increase inset to be safer (avoid neighbors)
+  const insetX = Math.min(PADDING_PX, cellW * 0.15); 
+  const insetY = Math.min(PADDING_PX, cellH * 0.15);
 
   const slots: Rect[] = [];
   for (let r = 0; r < ROWS; r++) {
