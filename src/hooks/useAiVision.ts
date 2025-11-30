@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ITEMS } from '../data/items';
+// @ts-ignore
+import VisionWorker from '../worker?worker';
 
 interface AnalysisResult {
   label: string;
@@ -49,9 +51,7 @@ const workerPendingPromises = new Map<string, (result: any) => void>();
 
 function getWorker(): Worker {
   if (!globalWorker) {
-    globalWorker = new Worker(new URL('../worker.ts', import.meta.url), {
-      type: 'module',
-    });
+    globalWorker = new VisionWorker();
 
     globalWorker.onerror = (error) => {
       console.error("[AiVision] Worker Error Details:", {
