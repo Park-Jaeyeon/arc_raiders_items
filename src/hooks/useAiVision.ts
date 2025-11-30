@@ -54,7 +54,13 @@ function getWorker(): Worker {
     });
 
     globalWorker.onerror = (error) => {
-      console.error("[AiVision] Worker Error:", error);
+      console.error("[AiVision] Worker Error Details:", {
+        message: error.message,
+        filename: error.filename,
+        lineno: error.lineno,
+        colno: error.colno,
+        error: error.error
+      });
     };
 
   // Update worker message handler to handle 'results' property
