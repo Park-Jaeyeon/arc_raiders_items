@@ -46,16 +46,16 @@ class VisionPipeline {
 
   static async getInstance() {
     const tf = await loadTransformers();
-    const { CLIPVisionModel, AutoProcessor } = tf;
+    const { AutoModel, AutoProcessor } = tf;
 
-    if (!CLIPVisionModel || !AutoProcessor) {
-        throw new Error(`Failed to load CLIPVisionModel or AutoProcessor. Keys: ${Object.keys(tf)}`);
+    if (!AutoModel || !AutoProcessor) {
+        throw new Error(`Failed to load AutoModel or AutoProcessor. Keys: ${Object.keys(tf)}`);
     }
 
     if (!this.modelPromise) {
       console.time('Loading Model');
       console.log(`Loading CLIP vision model (${MODEL_ID})...`);
-      this.modelPromise = CLIPVisionModel.from_pretrained(MODEL_ID, {
+      this.modelPromise = AutoModel.from_pretrained(MODEL_ID, {
         quantized: true,
       });
       this.processorPromise = AutoProcessor.from_pretrained(MODEL_ID);
@@ -123,16 +123,21 @@ const embedBatch = async (images: string[]): Promise<number[][]> => {
 
   // Run model (batch)
   console.log('[Worker] Running model inference...');
-  const { image_embeds } = await model(imageInputs);
+  const output = await model(imageInputs);
   console.log('[Worker] Inference complete.');
   
   // Process output
-  if (!image_embeds || !image_embeds.data) {
-    throw new Error('Model output (image_embeds) is missing or invalid.');
+  // AutoModel for CLIP usually returns { image_embeds: ... } or { pooler_output: ... }
+  // Check for image_embeds first, then pooler_output, then check if output itself is the tensor
+  const embeddingsTensor = output.image_embeds || output.pooler_output || output.last_hidden_state;
+
+  if (!embeddingsTensor || !embeddingsTensor.data) {
+    console.error('[Worker] Invalid model output:', output);
+    throw new Error('Model output is missing embeddings data.');
   }
 
-  const rawData = image_embeds.data as Float32Array; 
-  const dims = image_embeds.dims;
+  const rawData = embeddingsTensor.data as Float32Array; 
+  const dims = embeddingsTensor.dims;
   
   if (!dims || dims.length < 2) {
     throw new Error(`Invalid output dimensions: ${dims}`);
