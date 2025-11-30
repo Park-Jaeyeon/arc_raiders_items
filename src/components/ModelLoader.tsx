@@ -4,9 +4,10 @@ import { Cpu, Wifi, HardDrive } from 'lucide-react';
 interface Props {
   status: 'idle' | 'loading_model' | 'ready' | 'analyzing' | 'error';
   progress: { file: string; progress: number; status: string } | null;
+  message?: string;
 }
 
-export function ModelLoader({ status, progress }: Props) {
+export function ModelLoader({ status, progress, message }: Props) {
   const [dots, setDots] = useState('');
 
   useEffect(() => {
@@ -20,7 +21,17 @@ export function ModelLoader({ status, progress }: Props) {
 
   const isDownloading = status === 'loading_model';
   const percent = progress ? Math.round(progress.progress) : 0;
-  const fileName = progress ? progress.file : 'Initialize...';
+  
+  // Determine display text based on progress object OR message prop
+  let mainLog = 'Initialize...';
+  let subLog = isDownloading ? 'Allocating memory...' : 'Extracting features...';
+
+  if (progress) {
+    mainLog = progress.file;
+    subLog = progress.status;
+  } else if (message) {
+    mainLog = message;
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-neutral-950/90 backdrop-blur-md flex items-center justify-center text-amber-500 font-mono">
@@ -59,9 +70,9 @@ export function ModelLoader({ status, progress }: Props) {
               </div>
             </div>
 
-            <div className="h-12 bg-neutral-900/50 border border-amber-900/30 rounded p-2 font-mono text-xs text-amber-300/70 overflow-hidden flex flex-col justify-end">
-              <p>{'>'} {fileName}</p>
-              <p>{'>'} {isDownloading ? 'Allocating memory...' : 'Extracting features...'}{dots}</p>
+            <div className="h-16 bg-neutral-900/50 border border-amber-900/30 rounded p-2 font-mono text-xs text-amber-300/70 overflow-hidden flex flex-col justify-end whitespace-pre-wrap">
+              <p className="break-words">{'>'} {mainLog}</p>
+              <p>{'>'} {subLog}{dots}</p>
             </div>
           </div>
         </div>

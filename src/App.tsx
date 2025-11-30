@@ -204,7 +204,7 @@ function App() {
 
   return (
     <Layout>
-      <ModelLoader status={modelStatus} progress={null} />
+      <ModelLoader status={modelStatus} progress={null} message={status} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
