@@ -1,4 +1,4 @@
-import { env, pipeline, RawImage } from '@xenova/transformers';
+import { env, RawImage, CLIPVisionModel, AutoProcessor } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
 const MODEL_ID = 'Xenova/clip-vit-base-patch32';
@@ -10,17 +10,18 @@ env.localModelPath = '/models/';
 env.useBrowserCache = false;
 
 class VisionPipeline {
-  static pipePromise: Promise<any> | null = null;
+  static modelPromise: Promise<any> | null = null;
+  static processorPromise: Promise<any> | null = null;
 
   static async getInstance() {
-    if (!this.pipePromise) {
-      console.log(`Loading CLIP vision pipeline (${MODEL_ID})...`);
-      
-      this.pipePromise = pipeline('image-feature-extraction', MODEL_ID, {
+    if (!this.modelPromise) {
+      console.log(`Loading CLIP vision model (${MODEL_ID})...`);
+      this.modelPromise = CLIPVisionModel.from_pretrained(MODEL_ID, {
         quantized: true,
       });
+      this.processorPromise = AutoProcessor.from_pretrained(MODEL_ID);
     }
-    return this.pipePromise;
+    return Promise.all([this.modelPromise, this.processorPromise]);
   }
 }
 
@@ -57,13 +58,19 @@ const loadEmbeddings = async () => {
 };
 
 const embedImage = async (image: string | Blob): Promise<number[]> => {
-  const extractor = await VisionPipeline.getInstance();
+  const [model, processor] = await VisionPipeline.getInstance();
   
-  // Explicitly read the image using RawImage to handle various input types (Blob, Data URL) reliably
+  // Read image
   const processedImage = await RawImage.read(image);
   
-  const output = await extractor(processedImage, { pooling: 'mean', normalize: true });
-  const vec = Array.from(output.data as ArrayLike<number>);
+  // Preprocess image
+  const imageInputs = await processor(processedImage);
+  
+  // Run model
+  const { image_embeds } = await model(imageInputs);
+  
+  // Process output
+  const vec = Array.from(image_embeds.data as ArrayLike<number>);
   return normalize(vec);
 };
 
