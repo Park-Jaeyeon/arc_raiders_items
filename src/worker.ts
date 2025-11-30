@@ -46,78 +46,48 @@ let embeddingsPromise: Promise<Record<string, number[]>> | null = null;
 
 const loadEmbeddings = async () => {
   if (!embeddingsPromise) {
+    console.log('[Worker] Loading embeddings.json...');
     embeddingsPromise = (async () => {
-      const res = await fetch('/embeddings.json');
-      const json = await res.json() as Record<string, number[]>;
-      const normalized: Record<string, number[]> = {};
-      Object.entries(json).forEach(([name, vec]) => {
-        if (!Array.isArray(vec)) return;
-        normalized[name] = normalize(vec as number[]);
-      });
-      return normalized;
+      try {
+        const res = await fetch('/embeddings.json');
+        if (!res.ok) throw new Error(`Failed to fetch embeddings: ${res.status}`);
+        const json = await res.json() as Record<string, number[]>;
+        const normalized: Record<string, number[]> = {};
+        Object.entries(json).forEach(([name, vec]) => {
+          if (!Array.isArray(vec)) return;
+          normalized[name] = normalize(vec as number[]);
+        });
+        console.log(`[Worker] Loaded ${Object.keys(normalized).length} embeddings.`);
+        return normalized;
+      } catch (e) {
+        console.error('[Worker] Failed to load embeddings:', e);
+        throw e;
+      }
     })();
   }
   return embeddingsPromise;
 };
 
-const embedBatch = async (images: string[]): Promise<number[][]> => {
-  console.log(`[Worker] embedBatch: Processing ${images.length} images...`);
-  const [model, processor] = await VisionPipeline.getInstance();
-
-  // Read all images
-  console.log('[Worker] Reading images...');
-  const processedImages = await Promise.all(images.map(img => RawImage.read(img)));
-
-  // Preprocess images (batch)
-  console.log('[Worker] Preprocessing images...');
-  const imageInputs = await processor(processedImages);
-
-  // Run model (batch)
-  console.log('[Worker] Running model inference...');
-  const { image_embeds } = await model(imageInputs);
-  console.log('[Worker] Inference complete.');
-  
-  // Process output
-  if (!image_embeds || !image_embeds.data) {
-    throw new Error('Model output (image_embeds) is missing or invalid.');
-  }
-
-  const rawData = image_embeds.data as Float32Array; 
-  const dims = image_embeds.dims;
-  
-  if (!dims || dims.length < 2) {
-    throw new Error(`Invalid output dimensions: ${dims}`);
-  }
-
-  const batchSize = dims[0];
-  const hiddenSize = dims[1];
-  console.log(`[Worker] Output dims: [${batchSize}, ${hiddenSize}]`);
-  
-  const vectors: number[][] = [];
-  for (let i = 0; i < batchSize; i++) {
-    const start = i * hiddenSize;
-    const end = start + hiddenSize;
-    const vec = Array.from(rawData.slice(start, end));
-    vectors.push(normalize(vec));
-  }
-  
-  return vectors;
-};
+// ... embedBatch function ...
 
 self.onmessage = async (e) => {
   const { id, type, images, candidatesList } = e.data;
+  console.log(`[Worker] Received message: ${type} (ID: ${id})`);
 
   if (type === 'init') {
+    // ... existing init logic ...
     try {
       await VisionPipeline.getInstance();
       
       // Warm-up: Run inference on a dummy image to compile shaders/WASM
       try {
         console.time('Warm-up');
+        console.log('[Worker] Starting warm-up...');
         // 1x1 pixel black image (base64 png)
         const dummyImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
         await embedBatch([dummyImage]);
         console.timeEnd('Warm-up');
+        console.log('[Worker] Warm-up complete.');
       } catch (e) {
         console.warn('Warm-up failed (non-fatal):', e);
       }
@@ -135,11 +105,16 @@ self.onmessage = async (e) => {
   }
 
   if (type === 'analyze_batch') {
+    // ... existing analyze_batch logic ...
     try {
       console.time(`BatchInference-${id}`);
+      console.log('[Worker] Start loading embeddings for batch...');
       const embeddings = await loadEmbeddings();
+      console.log('[Worker] Embeddings loaded. Starting batch embedding...');
       const batchVectors = await embedBatch(images);
       console.timeEnd(`BatchInference-${id}`);
+      // ... rest of the logic
+
 
       const results = batchVectors.map((queryVec, idx) => {
         // Use specific candidates if provided for this image, otherwise use all
