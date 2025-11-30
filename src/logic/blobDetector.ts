@@ -1,7 +1,7 @@
 /**
  * Inventory grid detector
  * 목표: 항상 7x4(28칸)의 균일한 슬롯을 반환.
- * 절차: 이진화 -> 후보 사각형 추출 -> 유효 슬롯 필터 -> 전체 바운딩 박스 -> 7x4 분할
+ * 절차: 다중 Threshold 이진화 -> 후보 사각형 추출 -> 비율/크기 점수 평가 -> 최적 바운딩 박스 -> 7x4 분할
  */
 
 export interface Rect {
@@ -154,36 +154,6 @@ const sliceIntoGrid = (bounds: Rect): Rect[] => {
 export const detectInventorySlots = (imageData: ImageData, threshold = 50): Rect[] => {
   // threshold 파라미터는 이제 무시하고 내부적으로 다중 threshold 사용
   const bounds = findBestBounds(imageData);
-  return sliceIntoGrid(bounds);
-};
-
-/**
- * 7x4 그리드로 균등 분할
- */
-const sliceIntoGrid = (bounds: Rect): Rect[] => {
-  const cellW = bounds.width / COLS;
-  const cellH = bounds.height / ROWS;
-  const insetX = Math.min(PADDING_PX, cellW / 4);
-  const insetY = Math.min(PADDING_PX, cellH / 4);
-
-  const slots: Rect[] = [];
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const x = bounds.x + c * cellW;
-      const y = bounds.y + r * cellH;
-      slots.push({
-        x: x + insetX,
-        y: y + insetY,
-        width: Math.max(1, cellW - insetX * 2),
-        height: Math.max(1, cellH - insetY * 2),
-      });
-    }
-  }
-  return slots;
-};
-
-export const detectInventorySlots = (imageData: ImageData, threshold = 50): Rect[] => {
-  const bounds = findLargestContourBounds(imageData, threshold);
   return sliceIntoGrid(bounds);
 };
 
