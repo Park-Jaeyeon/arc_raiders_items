@@ -61,21 +61,37 @@ const loadEmbeddings = async () => {
 };
 
 const embedBatch = async (images: string[]): Promise<number[][]> => {
+  console.log(`[Worker] embedBatch: Processing ${images.length} images...`);
   const [model, processor] = await VisionPipeline.getInstance();
 
   // Read all images
+  console.log('[Worker] Reading images...');
   const processedImages = await Promise.all(images.map(img => RawImage.read(img)));
 
   // Preprocess images (batch)
+  console.log('[Worker] Preprocessing images...');
   const imageInputs = await processor(processedImages);
 
   // Run model (batch)
+  console.log('[Worker] Running model inference...');
   const { image_embeds } = await model(imageInputs);
+  console.log('[Worker] Inference complete.');
   
-  // Process output: image_embeds.data is a flat array [N * hidden_size]
-  // We need to reshape/slice it into N vectors.
-  const rawData = image_embeds.data as Float32Array; // or generic array
-  const [batchSize, hiddenSize] = image_embeds.dims; 
+  // Process output
+  if (!image_embeds || !image_embeds.data) {
+    throw new Error('Model output (image_embeds) is missing or invalid.');
+  }
+
+  const rawData = image_embeds.data as Float32Array; 
+  const dims = image_embeds.dims;
+  
+  if (!dims || dims.length < 2) {
+    throw new Error(`Invalid output dimensions: ${dims}`);
+  }
+
+  const batchSize = dims[0];
+  const hiddenSize = dims[1];
+  console.log(`[Worker] Output dims: [${batchSize}, ${hiddenSize}]`);
   
   const vectors: number[][] = [];
   for (let i = 0; i < batchSize; i++) {
