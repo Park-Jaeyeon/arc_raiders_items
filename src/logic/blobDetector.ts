@@ -1,7 +1,7 @@
 /**
  * Inventory grid detector
  * 목표: 항상 7x4(28칸)의 균일한 슬롯을 반환.
- * 절차: 다중 Threshold 이진화 -> 후보 사각형 추출 -> 비율/크기 점수 평가 -> 최적 바운딩 박스 -> 7x4 분할
+ * 절차: 다중 Threshold 이진화 -> Morphological Dilation (병합) -> 후보 사각형 추출 -> 비율/크기 점수 평가 -> 최적 바운딩 박스 -> 7x4 분할
  */
 
 export interface Rect {
@@ -17,19 +17,6 @@ const COLS = 7;
 const ROWS = 4;
 const PADDING_PX = 8;
 const TARGET_ASPECT = COLS / ROWS; // 1.75
-
-/**
- * 다중 Threshold를 사용하여 가장 적합한 인벤토리 영역을 찾는다.
- * 점수 기준: 
- * 1. 비율(Aspect Ratio): 7:4 (1.75)에 가까울수록 높은 점수
- * 2. 크기(Area): 너무 작지 않고 화면을 적절히 채우는 크기
- */
-const findBestBounds = (imageData: ImageData): Rect => {
-  const { width, height } = imageData;
-  const size = width * height;
-  
-  let bestRect: Rect = { x: 0, y: 0, width, height };
-  let bestScore = -Infinity;
 
 // Morphological Dilation (팽창) - 흩어진 슬롯을 하나로 뭉침
 const dilate = (data: Uint8Array, width: number, height: number, kernelSize: number) => {
@@ -56,6 +43,9 @@ const dilate = (data: Uint8Array, width: number, height: number, kernelSize: num
 
 /**
  * 다중 Threshold를 사용하여 가장 적합한 인벤토리 영역을 찾는다.
+ * 점수 기준: 
+ * 1. 비율(Aspect Ratio): 7:4 (1.75)에 가까울수록 높은 점수
+ * 2. 크기(Area): 너무 작지 않고 화면을 적절히 채우는 크기
  */
 const findBestBounds = (imageData: ImageData): Rect => {
   const { width, height } = imageData;
@@ -64,8 +54,8 @@ const findBestBounds = (imageData: ImageData): Rect => {
   let bestRect: Rect = { x: 0, y: 0, width, height };
   let bestScore = -Infinity;
 
-  // 여러 임계값으로 시도
-  const thresholds = [30, 60, 90, 120, 150];
+  // 1. 다양한 임계값 시도 (더 촘촘하게)
+  const thresholds = [10, 30, 50, 70, 90, 110, 130, 150, 180, 210];
 
   for (const th of thresholds) {
     const binary = new Uint8Array(size);
@@ -98,7 +88,7 @@ const findBestBounds = (imageData: ImageData): Rect => {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const idx = y * width + x;
-        if (dilated[idx] === 0) continue; // binary 대신 dilated 사용
+        if (dilated[idx] === 0) continue;
         const left = x > 0 ? labels[idx - 1] : 0;
         const top = y > 0 ? labels[idx - width] : 0;
         if (left === 0 && top === 0) {
@@ -138,13 +128,12 @@ const findBestBounds = (imageData: ImageData): Rect => {
       const h = b.maxY - b.minY + 1;
       const area = w * h;
       
-      // 크기 조건: 화면의 10% 이상 (너무 작은 노이즈 제거, 그러나 절반 인식 방지 위해 적당히)
-      if (area < size * 0.10 || area > size * 0.95) return;
+      // 조건 완화: 화면의 2% 이상이면 후보로 인정
+      if (area < size * 0.02 || area > size * 0.98) return;
 
       const aspect = w / h;
       
-      // 비율 조건 완화: 1.2 ~ 2.5 (7:4는 1.75지만, 여백이나 UI 요소에 따라 달라질 수 있음)
-      // 너무 정사각형(1.0)에 가깝거나 너무 길쭉한 것만 제외
+      // 비율 조건 완화: 1.2 ~ 2.8 허용
       if (aspect < 1.2 || aspect > 2.8) return;
 
       const centerX = (b.minX + b.maxX) / 2;
@@ -152,16 +141,15 @@ const findBestBounds = (imageData: ImageData): Rect => {
       const imgCenterX = width / 2;
       const imgCenterY = height / 2;
 
-      // 중앙 거리 점수: 화면 중앙에 가까울수록 높은 점수 (0~1)
+      // 중앙 거리 점수
       const distNorm = Math.sqrt(Math.pow(centerX - imgCenterX, 2) + Math.pow(centerY - imgCenterY, 2)) / Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
       const centerScore = 1 - distNorm;
 
-      // 비율 점수: 1.75(Target)에 가까우면 좋지만 가중치를 낮춤
+      // 비율 점수
       const aspectScore = 1 - Math.abs(aspect - TARGET_ASPECT) / TARGET_ASPECT; 
       const areaScore = area / size;
 
-      // 종합 점수: 중앙 위치 > 크기 > 비율 순으로 중요도 부여
-      // 중앙에 있는 큰 박스를 찾는 것이 핵심
+      // 종합 점수
       const score = centerScore * 3.0 + areaScore * 2.0 + aspectScore * 1.0;
 
       if (score > bestScore) {
@@ -171,7 +159,7 @@ const findBestBounds = (imageData: ImageData): Rect => {
     });
   }
 
-  // Fallback 조건 완화: 0.3점 이상이면 인정
+  // Fallback
   if (bestScore < 0.3) {
     return { x: 0, y: 0, width, height };
   }
