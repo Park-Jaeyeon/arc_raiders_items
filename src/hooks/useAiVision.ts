@@ -53,8 +53,9 @@ function getWorker(): Worker {
       type: 'module',
     });
 
+  // Update worker message handler to handle 'results' property
     globalWorker.onmessage = (e) => {
-      const { id, status, result, error } = e.data;
+      const { id, status, result, results, error } = e.data;
 
       // Handle initialization ready message
       if (status === 'ready') {
@@ -66,7 +67,8 @@ function getWorker(): Worker {
       
       if (resolver) {
         if (status === 'success') {
-          resolver(result);
+          // Support both single result and batch results
+          resolver(results || result);
         } else {
           console.error(error);
           resolver(null);
@@ -90,81 +92,107 @@ export const useAiVision = () => {
     setIsReady(true);
   }, []);
 
-  const analyzeImage = useCallback(async (
-    imageBlob: Blob, 
-    hintText: string = ''
-  ): Promise<AnalysisResult | null> => {
+  const analyzeBatch = useCallback(async (
+    items: { imageBlob: Blob; hintText?: string }[]
+  ): Promise<(AnalysisResult | null)[]> => {
     
-    // --- 1. Fast Path: OCR-based Bypass ---
-    // 텍스트가 명확하면 무거운 AI Vision 모델을 돌리지 않고 바로 결과를 반환합니다.
-    if (hintText && hintText.length >= 3) {
-      const cleanHint = hintText.toLowerCase().trim();
+    // 1. Pre-process: Check OCR shortcuts first
+    const results: (AnalysisResult | null)[] = new Array(items.length).fill(null);
+    const pendingIndices: number[] = [];
+    const pendingImages: string[] = [];
+    const pendingCandidatesList: string[][] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const { imageBlob, hintText } = items[i];
       
-      // A. 단순 포함/일치 검색 (이름 + 별칭)
-      const exactMatch = ITEMS.find(item => 
-        item.name.toLowerCase() === cleanHint || (item.aliases || []).some((a: string) => a.toLowerCase() === cleanHint)
-      );
-      if (exactMatch) {
-        return { label: exactMatch.name, score: 1.0 };
+      // --- Fast Path: OCR-based Bypass ---
+      if (hintText && hintText.length >= 3) {
+        const cleanHint = hintText.toLowerCase().trim();
+        
+        // A. Exact/Alias Match
+        const exactMatch = ITEMS.find(item => 
+          item.name.toLowerCase() === cleanHint || (item.aliases || []).some((a: string) => a.toLowerCase() === cleanHint)
+        );
+        if (exactMatch) {
+          results[i] = { label: exactMatch.name, score: 1.0 };
+          continue;
+        }
+
+        // B. Levenshtein Distance
+        const scoredItems = ITEMS.map((item: any) => {
+          const candidates = [item.name.toLowerCase(), ...(item.aliases || []).map((a: string) => a.toLowerCase())];
+          const dist = Math.min(...candidates.map((c: string) => levenshteinDistance(cleanHint, c)));
+          return { name: item.name, dist };
+        });
+        scoredItems.sort((a: any, b: any) => a.dist - b.dist);
+
+        // High confidence match
+        if (scoredItems[0].dist <= 2) {
+           const len = scoredItems[0].name.length;
+           if (len > 4 || scoredItems[0].dist <= 1) {
+              results[i] = { label: scoredItems[0].name, score: 0.95 };
+              continue;
+           }
+        }
       }
 
-      // B. Levenshtein 거리 계산 (오타 보정)
-      const scoredItems = ITEMS.map((item: any) => {
-        const candidates = [item.name.toLowerCase(), ...(item.aliases || []).map((a: string) => a.toLowerCase())];
-        const dist = Math.min(...candidates.map((c: string) => levenshteinDistance(cleanHint, c)));
-        return { name: item.name, dist };
-      });
+      // If no OCR shortcut, add to pending for AI
+      pendingIndices.push(i);
+      
+      // Convert Blob to Base64
+      try {
+        const base64 = await blobToDataURL(imageBlob);
+        pendingImages.push(base64);
+        
+        // Generate candidates for AI if hint exists but wasn't strong enough
+        let candidates: string[] = [];
+        if (hintText && hintText.length > 2) {
+          const cleanHint = hintText.toLowerCase().trim();
+          const scoredItems = ITEMS.map((item: any) => {
+            const cands = [item.name.toLowerCase(), ...(item.aliases || []).map((a: string) => a.toLowerCase())];
+            const dist = Math.min(...candidates.map((c: string) => levenshteinDistance(cleanHint, c)));
+            return { name: item.name, dist };
+          });
+          scoredItems.sort((a: any, b: any) => a.dist - b.dist);
+          candidates = scoredItems.slice(0, 10).map((item: any) => item.name);
+        }
+        pendingCandidatesList.push(candidates);
 
-      scoredItems.sort((a: any, b: any) => a.dist - b.dist);
-
-      // 거리가 2 이하(매우 유사)면 신뢰하고 반환
-      if (scoredItems[0].dist <= 2) {
-         const len = scoredItems[0].name.length;
-         if (len > 4 || scoredItems[0].dist <= 1) {
-            return { label: scoredItems[0].name, score: 0.95 };
-         }
+      } catch (e) {
+        console.error(`Failed to convert image at index ${i}`, e);
+        // result[i] stays null
       }
     }
-    // ---------------------------------------
 
-    // --- 2. Slow Path: AI Vision Model ---
+    // If nothing to process via AI, return immediately
+    if (pendingIndices.length === 0) {
+      return results;
+    }
+
+    // 2. Batch Process via Worker
     const worker = getWorker();
     const id = Math.random().toString(36).substring(7);
-    
-    // Convert Blob to Base64 Data URL
-    let imageDataUrl: string;
-    try {
-      imageDataUrl = await blobToDataURL(imageBlob);
-    } catch (e) {
-      console.error("Failed to convert blob to base64", e);
-      return null;
-    }
 
-    let candidateLabels: string[] = [];
-    
-    // AI에게 줄 후보군을 OCR 텍스트로 좁힘 (속도 향상)
-    if (hintText && hintText.length > 2) {
-      const cleanHint = hintText.toLowerCase().trim();
-      const scoredItems = ITEMS.map((item: any) => {
-        const candidates = [item.name.toLowerCase(), ...(item.aliases || []).map((a: string) => a.toLowerCase())];
-        const dist = Math.min(...candidates.map((c: string) => levenshteinDistance(cleanHint, c)));
-        return { name: item.name, dist };
-      });
-      scoredItems.sort((a: any, b: any) => a.dist - b.dist);
-      
-      // 상위 5~10개만 후보로 전달
-      candidateLabels = scoredItems.slice(0, 10).map((i: any) => i.name);
-    }
-
-    return new Promise((resolve) => {
+    const workerResult = await new Promise<AnalysisResult[]>((resolve) => {
       workerPendingPromises.set(id, resolve);
       worker.postMessage({ 
         id, 
-        image: imageDataUrl,
-        candidateLabels 
+        type: 'analyze_batch',
+        images: pendingImages,
+        candidatesList: pendingCandidatesList 
       });
     });
+
+    // 3. Merge results back
+    if (workerResult && Array.isArray(workerResult)) {
+      workerResult.forEach((res, idx) => {
+        const originalIndex = pendingIndices[idx];
+        results[originalIndex] = res;
+      });
+    }
+
+    return results;
   }, []);
 
-  return { analyzeImage, isReady };
+  return { analyzeBatch, isReady };
 };

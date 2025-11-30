@@ -60,25 +60,36 @@ const loadEmbeddings = async () => {
   return embeddingsPromise;
 };
 
-const embedImage = async (image: string | Blob): Promise<number[]> => {
+const embedBatch = async (images: string[]): Promise<number[][]> => {
   const [model, processor] = await VisionPipeline.getInstance();
-  
-  // Read image
-  const processedImage = await RawImage.read(image);
-  
-  // Preprocess image
-  const imageInputs = await processor(processedImage);
-  
-  // Run model
+
+  // Read all images
+  const processedImages = await Promise.all(images.map(img => RawImage.read(img)));
+
+  // Preprocess images (batch)
+  const imageInputs = await processor(processedImages);
+
+  // Run model (batch)
   const { image_embeds } = await model(imageInputs);
   
-  // Process output
-  const vec = Array.from(image_embeds.data as ArrayLike<number>);
-  return normalize(vec);
+  // Process output: image_embeds.data is a flat array [N * hidden_size]
+  // We need to reshape/slice it into N vectors.
+  const rawData = image_embeds.data as Float32Array; // or generic array
+  const [batchSize, hiddenSize] = image_embeds.dims; 
+  
+  const vectors: number[][] = [];
+  for (let i = 0; i < batchSize; i++) {
+    const start = i * hiddenSize;
+    const end = start + hiddenSize;
+    const vec = Array.from(rawData.slice(start, end));
+    vectors.push(normalize(vec));
+  }
+  
+  return vectors;
 };
 
 self.onmessage = async (e) => {
-  const { id, type, image, candidateLabels } = e.data;
+  const { id, type, images, candidatesList } = e.data;
 
   if (type === 'init') {
     try {
@@ -95,47 +106,47 @@ self.onmessage = async (e) => {
     return;
   }
 
-  try {
-    const labelsToCheck: string[] = (candidateLabels && candidateLabels.length > 0) 
-      ? candidateLabels 
-      : ITEMS.map((item: any) => item.name);
+  if (type === 'analyze_batch') {
+    try {
+      console.time(`BatchInference-${id}`);
+      const embeddings = await loadEmbeddings();
+      const batchVectors = await embedBatch(images);
+      console.timeEnd(`BatchInference-${id}`);
 
-    const embeddings = await loadEmbeddings();
-    
-    console.time(`Inference-${id}`);
-    const queryEmbedding = await embedImage(image);
-    console.timeEnd(`Inference-${id}`);
+      const results = batchVectors.map((queryVec, idx) => {
+        // Use specific candidates if provided for this image, otherwise use all
+        const labelsToCheck: string[] = (candidatesList && candidatesList[idx] && candidatesList[idx].length > 0)
+          ? candidatesList[idx]
+          : ITEMS.map((item: any) => item.name);
 
-    const scored = labelsToCheck
-      .map((label: string) => {
-        const ref = embeddings[label];
-        if (!ref) return null;
-        return { label, score: cosineSimilarity(queryEmbedding, ref) };
-      })
-      .filter(Boolean) as { label: string; score: number }[];
+        const scored = labelsToCheck
+          .map((label: string) => {
+            const ref = embeddings[label];
+            if (!ref) return null;
+            return { label, score: cosineSimilarity(queryVec, ref) };
+          })
+          .filter(Boolean) as { label: string; score: number }[];
 
-    if (scored.length === 0) {
-      throw new Error('No embeddings available for candidate labels.');
+        if (scored.length === 0) return { label: "Unknown", score: 0 };
+
+        scored.sort((a, b) => b.score - a.score);
+        return scored[0];
+      });
+
+      self.postMessage({
+        id,
+        status: 'success',
+        results: results
+      });
+
+    } catch (error) {
+      console.error('Worker Batch Error:', error);
+      self.postMessage({
+        id,
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
-
-    scored.sort((a, b) => b.score - a.score);
-    const top = scored[0];
-
-    console.log('Top predictions (cosine):', scored.slice(0, 3));
-
-    self.postMessage({
-      id,
-      status: 'success',
-      result: top,
-      candidatesUsed: labelsToCheck.length
-    });
-
-  } catch (error) {
-    console.error('Worker Error:', error);
-    self.postMessage({
-      id,
-      status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    return;
   }
 };

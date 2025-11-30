@@ -25,7 +25,7 @@ function App() {
   const ocrResultRef = useRef<RecognizeResult | null>(null);
   const imgElementRef = useRef<HTMLImageElement | null>(null);
 
-  const { analyzeImage, isReady: isVisionReady } = useAiVision();
+  const { analyzeBatch, isReady: isVisionReady } = useAiVision();
 
   // Sync vision readiness
   if (isVisionReady && modelStatus === 'idle') {
@@ -46,7 +46,7 @@ function App() {
     }
 
     setModelStatus('analyzing');
-    addLog(`${blobs.length}개 슬롯 분석 시작...`);
+    addLog(`${blobs.length}개 슬롯 이미지 추출 및 분석 준비...`);
     
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
@@ -54,11 +54,8 @@ function App() {
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(img, 0, 0);
 
-    const rawItems: { name: string; qty: number }[] = [];
-    let processedCount = 0;
-    const BATCH_SIZE = 4;
-
-    const processBlob = async (blob: Rect) => {
+    // 1. Prepare all blob data first
+    const preparePromises = blobs.map(async (blob) => {
       const itemCanvas = document.createElement('canvas');
       itemCanvas.width = blob.width;
       itemCanvas.height = blob.height;
@@ -70,7 +67,6 @@ function App() {
       );
 
       const searchMarginBottom = blob.height * 0.6;
-
       const matchedWords = ocrWords.filter((w: any) => {
         const wx = (w.bbox.x0 + w.bbox.x1) / 2;
         const wy = (w.bbox.y0 + w.bbox.y1) / 2;
@@ -83,35 +79,41 @@ function App() {
       const blobData = await new Promise<Blob | null>(resolve => itemCanvas.toBlob(resolve));
       
       if (!blobData) return null;
+      return { imageBlob: blobData, hintText };
+    });
 
-      const visionResult = await analyzeImage(blobData, hintText);
-      if (!visionResult) return null;
+    const preparedItems = (await Promise.all(preparePromises)).filter((item): item is { imageBlob: Blob; hintText: string } => item !== null);
 
-      let qty = 1;
-      const xMatch = hintText.match(/x\s*(\d+)/i);
-      if (xMatch) {
-        qty = parseInt(xMatch[1], 10);
-      } else {
-        const allNumbers = hintText.match(/(\d+)/g);
-        if (allNumbers && allNumbers.length > 0) {
-          qty = parseInt(allNumbers[allNumbers.length - 1], 10);
+    addLog(`${preparedItems.length}개 슬롯 분석 시작...`);
+
+    const rawItems: { name: string; qty: number }[] = [];
+    let processedCount = 0;
+    const BATCH_SIZE = 8; // Larger batch size for worker
+
+    for (let i = 0; i < preparedItems.length; i += BATCH_SIZE) {
+      const chunk = preparedItems.slice(i, i + BATCH_SIZE);
+      const chunkResults = await analyzeBatch(chunk);
+
+      chunkResults.forEach((res, idx) => {
+        if (!res) return;
+        
+        const { hintText } = chunk[idx];
+        let qty = 1;
+        const xMatch = hintText.match(/x\s*(\d+)/i);
+        if (xMatch) {
+          qty = parseInt(xMatch[1], 10);
+        } else {
+          const allNumbers = hintText.match(/(\d+)/g);
+          if (allNumbers && allNumbers.length > 0) {
+            qty = parseInt(allNumbers[allNumbers.length - 1], 10);
+          }
         }
-      }
-
-      return { name: visionResult.label, qty };
-    };
-
-    for (let i = 0; i < blobs.length; i += BATCH_SIZE) {
-      const chunk = blobs.slice(i, i + BATCH_SIZE);
-      const chunkResults = await Promise.all(chunk.map(processBlob));
-
-      chunkResults.forEach((item) => {
-        if (!item) return;
-        rawItems.push(item);
+        
+        rawItems.push({ name: res.label, qty });
       });
 
       processedCount += chunk.length;
-      setProgress((processedCount / blobs.length) * 100);
+      setProgress((processedCount / preparedItems.length) * 100);
 
       const classified = classifyItems(rawItems);
       setResults(classified);
@@ -174,7 +176,7 @@ function App() {
     };
 
     img.src = imageUrl;
-  }, [isVisionReady, analyzeImage]);
+  }, [isVisionReady, analyzeBatch]);
 
   // 재분석 핸들러
   const handleReanalyze = useCallback(async (options: { threshold?: number; invert?: boolean; manualBlobs?: Rect[] }) => {
@@ -190,7 +192,7 @@ function App() {
     } else {
         addLog('이 설정 변경은 아직 지원되지 않습니다. (수동 영역 지정만 가능)');
     }
-  }, [analyzeImage]);
+  }, [analyzeBatch]);
 
   return (
     <Layout>

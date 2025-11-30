@@ -39,3 +39,17 @@ export interface ItemResult {
   confidence: number;
   details?: string;
 }
+
+export interface WorkerMessage {
+  id: string;
+  type: 'init' | 'analyze_batch';
+  images?: string[]; // Base64 data URLs
+  candidatesList?: string[][]; // Optional: candidate labels for each image
+}
+
+export interface WorkerResponse {
+  id: string;
+  status: 'ready' | 'success' | 'error';
+  results?: { label: string; score: number }[];
+  error?: string;
+}
