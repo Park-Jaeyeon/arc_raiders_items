@@ -103,18 +103,31 @@ const findBestBounds = (imageData: ImageData): Rect => {
       const h = b.maxY - b.minY + 1;
       const area = w * h;
       
-      // 조건 완화: 화면의 2% 이상이면 후보로 인정 (작은 인벤토리 대응)
-      if (area < size * 0.02 || area > size * 0.98) return;
+      // 크기 조건: 화면의 10% 이상 (너무 작은 노이즈 제거, 그러나 절반 인식 방지 위해 적당히)
+      if (area < size * 0.10 || area > size * 0.95) return;
 
       const aspect = w / h;
+      
+      // 비율 조건 완화: 1.2 ~ 2.5 (7:4는 1.75지만, 여백이나 UI 요소에 따라 달라질 수 있음)
+      // 너무 정사각형(1.0)에 가깝거나 너무 길쭉한 것만 제외
+      if (aspect < 1.2 || aspect > 2.8) return;
+
+      const centerX = (b.minX + b.maxX) / 2;
+      const centerY = (b.minY + b.maxY) / 2;
+      const imgCenterX = width / 2;
+      const imgCenterY = height / 2;
+
+      // 중앙 거리 점수: 화면 중앙에 가까울수록 높은 점수 (0~1)
+      const distNorm = Math.sqrt(Math.pow(centerX - imgCenterX, 2) + Math.pow(centerY - imgCenterY, 2)) / Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
+      const centerScore = 1 - distNorm;
+
+      // 비율 점수: 1.75(Target)에 가까우면 좋지만 가중치를 낮춤
       const aspectScore = 1 - Math.abs(aspect - TARGET_ASPECT) / TARGET_ASPECT; 
       const areaScore = area / size;
 
-      // 비율 조건 완화: 1.3 ~ 2.5 허용 (7:4 = 1.75)
-      if (aspect < 1.3 || aspect > 2.5) return;
-
-      // 점수 계산: 비율 점수 가중치 강화
-      const score = aspectScore * 3.0 + areaScore;
+      // 종합 점수: 중앙 위치 > 크기 > 비율 순으로 중요도 부여
+      // 중앙에 있는 큰 박스를 찾는 것이 핵심
+      const score = centerScore * 3.0 + areaScore * 2.0 + aspectScore * 1.0;
 
       if (score > bestScore) {
         bestScore = score;
