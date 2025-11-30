@@ -1,7 +1,7 @@
 import { env, pipeline, RawImage } from '@xenova/transformers';
 import { ITEMS } from './data/items';
 
-const MODEL_ID = 'Xenova/clip-vit-base-patch32-vision';
+const MODEL_ID = 'Xenova/clip-vit-base-patch32';
 
 // Configure Transformers.js to use local models
 env.allowLocalModels = true;
