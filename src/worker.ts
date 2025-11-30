@@ -26,7 +26,7 @@ async function loadTransformers() {
       // Configure Transformers.js
       if (transformers.env) {
         transformers.env.allowLocalModels = true;
-        transformers.env.allowRemoteModels = false;
+        transformers.env.allowRemoteModels = true; // Enable remote fallback
         transformers.env.localModelPath = '/models/';
         transformers.env.useBrowserCache = true;
       }
