@@ -94,6 +94,14 @@ self.onmessage = async (e) => {
   if (type === 'init') {
     try {
       await VisionPipeline.getInstance();
+      
+      // Warm-up: Run inference on a dummy image to compile shaders/WASM
+      console.time('Warm-up');
+      // 1x1 pixel black image (base64 png)
+      const dummyImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+      await embedBatch([dummyImage]);
+      console.timeEnd('Warm-up');
+
       self.postMessage({ id, status: 'ready' });
     } catch (error) {
       console.error('Worker Init Error:', error);
