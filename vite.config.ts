@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  optimizeDeps: {
+    exclude: ['@xenova/transformers'],
+  },
+  worker: {
+    format: 'es',
+  },
   server: {
     headers: {
       'Cache-Control': 'no-store',
