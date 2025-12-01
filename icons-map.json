@@ -1,0 +1,1186 @@
+[
+  {
+    "name": "Adrenaline Shot",
+    "file": "items/adrenaline-shot.png"
+  },
+  {
+    "name": "Advanced ARC Powercell",
+    "file": "items/advanced-arc-powercell.png"
+  },
+  {
+    "name": "Advanced Electrical Components",
+    "file": "items/advanced-electrical-components.png"
+  },
+  {
+    "name": "Advanced Mechanical Components",
+    "file": "items/advanced-mechanical-components.png"
+  },
+  {
+    "name": "Agave Juice",
+    "file": "items/agave-juice.png"
+  },
+  {
+    "name": "Agave",
+    "file": "items/agave.png"
+  },
+  {
+    "name": "Air Freshener",
+    "file": "items/air-freshener.png"
+  },
+  {
+    "name": "Alarm Clock",
+    "file": "items/alarm-clock.png"
+  },
+  {
+    "name": "Angled Grip I",
+    "file": "items/angled-grip-i.png"
+  },
+  {
+    "name": "Angled Grip II",
+    "file": "items/angled-grip-ii.png"
+  },
+  {
+    "name": "Angled Grip III",
+    "file": "items/angled-grip-iii.png"
+  },
+  {
+    "name": "Antiseptic",
+    "file": "items/antiseptic.png"
+  },
+  {
+    "name": "Anvil Splitter",
+    "file": "items/anvil-splitter.png"
+  },
+  {
+    "name": "Aphelion",
+    "file": "items/aphelion.png"
+  },
+  {
+    "name": "Apricot",
+    "file": "items/apricot.png"
+  },
+  {
+    "name": "ARC Alloy",
+    "file": "items/arc-alloy.png"
+  },
+  {
+    "name": "ARC Circuitry",
+    "file": "items/arc-circuitry.png"
+  },
+  {
+    "name": "ARC Coolant",
+    "file": "items/arc-coolant.png"
+  },
+  {
+    "name": "ARC Flex Rubber",
+    "file": "items/arc-flex-rubber.png"
+  },
+  {
+    "name": "ARC Motion Core",
+    "file": "items/arc-motion-core.png"
+  },
+  {
+    "name": "ARC Performance Steel",
+    "file": "items/arc-performance-steel.png"
+  },
+  {
+    "name": "ARC Powercell",
+    "file": "items/arc-powercell.png"
+  },
+  {
+    "name": "ARC Synthetic Resin",
+    "file": "items/arc-synthetic-resin.png"
+  },
+  {
+    "name": "ARC Thermo Lining",
+    "file": "items/arc-thermo-lining.png"
+  },
+  {
+    "name": "Assorted Seeds",
+    "file": "items/assorted-seeds.png"
+  },
+  {
+    "name": "Bandage",
+    "file": "items/bandage.png"
+  },
+  {
+    "name": "Barricade Kit",
+    "file": "items/barricade-kit.png"
+  },
+  {
+    "name": "Bastion Cell",
+    "file": "items/bastion-cell.png"
+  },
+  {
+    "name": "Battery",
+    "file": "items/battery.png"
+  },
+  {
+    "name": "Bettina",
+    "file": "items/bettina.png"
+  },
+  {
+    "name": "Bicycle Pump",
+    "file": "items/bicycle-pump.png"
+  },
+  {
+    "name": "Binoculars",
+    "file": "items/binoculars.png"
+  },
+  {
+    "name": "Blaze Grenade Trap",
+    "file": "items/blaze-grenade-trap.png"
+  },
+  {
+    "name": "Blaze Grenade",
+    "file": "items/blaze-grenade.png"
+  },
+  {
+    "name": "Bloated Tuna Can",
+    "file": "items/bloated-tuna-can.png"
+  },
+  {
+    "name": "Blue Gate Confiscation Room Key",
+    "file": "items/blue-gate-confiscation-room-key.png"
+  },
+  {
+    "name": "Blue Gate Village Key",
+    "file": "items/blue-gate-village-key.png"
+  },
+  {
+    "name": "Bombardier Cell",
+    "file": "items/bombardier-cell.png"
+  },
+  {
+    "name": "Breathtaking Snow Globe",
+    "file": "items/breathtaking-snow-globe.png"
+  },
+  {
+    "name": "Broken Flashlight",
+    "file": "items/broken-flashlight.png"
+  },
+  {
+    "name": "Broken Guidance System",
+    "file": "items/broken-guidance-system.png"
+  },
+  {
+    "name": "Broken Handheld Radio",
+    "file": "items/broken-handheld-radio.png"
+  },
+  {
+    "name": "Broken Taser",
+    "file": "items/broken-taser.png"
+  },
+  {
+    "name": "Burned ARC Circuitry",
+    "file": "items/burned-arc-circuitry.png"
+  },
+  {
+    "name": "Camera Lens",
+    "file": "items/camera-lens.png"
+  },
+  {
+    "name": "Candle Holder",
+    "file": "items/candle-holder.png"
+  },
+  {
+    "name": "Canister",
+    "file": "items/canister.png"
+  },
+  {
+    "name": "Cat Bed",
+    "file": "items/cat-bed.png"
+  },
+  {
+    "name": "Chemicals",
+    "file": "items/chemicals.png"
+  },
+  {
+    "name": "Coffee Pot",
+    "file": "items/coffee-pot.png"
+  },
+  {
+    "name": "Combat Mk. 1",
+    "file": "items/combat-mk-1.png"
+  },
+  {
+    "name": "Combat Mk. 2",
+    "file": "items/combat-mk-2.png"
+  },
+  {
+    "name": "Combat Mk. 3 (Aggressive)",
+    "file": "items/combat-mk-3-aggressive.png"
+  },
+  {
+    "name": "Combat Mk. 3 (Flanking)",
+    "file": "items/combat-mk-3-flanking.png"
+  },
+  {
+    "name": "Compensator I",
+    "file": "items/compensator-i.png"
+  },
+  {
+    "name": "Compensator II",
+    "file": "items/compensator-ii.png"
+  },
+  {
+    "name": "Compensator III",
+    "file": "items/compensator-iii.png"
+  },
+  {
+    "name": "Complex Gun Parts",
+    "file": "items/complex-gun-parts.png"
+  },
+  {
+    "name": "Coolant",
+    "file": "items/coolant.png"
+  },
+  {
+    "name": "Cooling Coil",
+    "file": "items/cooling-coil.png"
+  },
+  {
+    "name": "Cooling Fan",
+    "file": "items/cooling-fan.png"
+  },
+  {
+    "name": "Cracked Bioscanner",
+    "file": "items/cracked-bioscanner.png"
+  },
+  {
+    "name": "Crude Explosives",
+    "file": "items/crude-explosives.png"
+  },
+  {
+    "name": "Crumpled Plastic Bottle",
+    "file": "items/crumpled-plastic-bottle.png"
+  },
+  {
+    "name": "Damaged ARC Motion Core",
+    "file": "items/damaged-arc-motion-core.png"
+  },
+  {
+    "name": "Damaged ARC Powercell",
+    "file": "items/damaged-arc-powercell.png"
+  },
+  {
+    "name": "Damaged Fireball Burner",
+    "file": "items/damaged-fireball-burner.png"
+  },
+  {
+    "name": "Damaged Heat Sink",
+    "file": "items/damaged-heat-sink.png"
+  },
+  {
+    "name": "Damaged Hornet Driver",
+    "file": "items/damaged-hornet-driver.png"
+  },
+  {
+    "name": "Damaged Rocketeer Driver",
+    "file": "items/damaged-rocketeer-driver.png"
+  },
+  {
+    "name": "Damaged Snitch Scanner",
+    "file": "items/damaged-snitch-scanner.png"
+  },
+  {
+    "name": "Damaged Tick Pod",
+    "file": "items/damaged-tick-pod.png"
+  },
+  {
+    "name": "Damaged Wasp Driver",
+    "file": "items/damaged-wasp-driver.png"
+  },
+  {
+    "name": "Dart Board",
+    "file": "items/dart-board.png"
+  },
+  {
+    "name": "Deadline",
+    "file": "items/deadline.png"
+  },
+  {
+    "name": "Defibrillator",
+    "file": "items/defibrillator.png"
+  },
+  {
+    "name": "Deflated Football",
+    "file": "items/deflated-football.png"
+  },
+  {
+    "name": "Degraded ARC Rubber",
+    "file": "items/degraded-arc-rubber.png"
+  },
+  {
+    "name": "Diving Goggles",
+    "file": "items/diving-goggles.png"
+  },
+  {
+    "name": "Dog Collar",
+    "file": "items/dog-collar.png"
+  },
+  {
+    "name": "Door Blocker",
+    "file": "items/door-blocker.png"
+  },
+  {
+    "name": "Dried-Out ARC Resin",
+    "file": "items/dried-out-arc-resin.png"
+  },
+  {
+    "name": "Duct Tape",
+    "file": "items/duct-tape.png"
+  },
+  {
+    "name": "Durable Cloth",
+    "file": "items/durable-cloth.png"
+  },
+  {
+    "name": "Electrical Components",
+    "file": "items/electrical-components.png"
+  },
+  {
+    "name": "Empty Wine Bottle",
+    "file": "items/empty-wine-bottle.png"
+  },
+  {
+    "name": "Energy Clip",
+    "file": "items/energy-clip.png"
+  },
+  {
+    "name": "Equalizer",
+    "file": "items/equalizer.png"
+  },
+  {
+    "name": "Exodus Modules",
+    "file": "items/exodus-modules.png"
+  },
+  {
+    "name": "Expired Pasta",
+    "file": "items/expired-pasta.png"
+  },
+  {
+    "name": "Expired Respirator",
+    "file": "items/expired-respirator.png"
+  },
+  {
+    "name": "Explosive Compound",
+    "file": "items/explosive-compound.png"
+  },
+  {
+    "name": "Explosive Mine",
+    "file": "items/explosive-mine.png"
+  },
+  {
+    "name": "Extended Barrel",
+    "file": "items/extended-barrel.png"
+  },
+  {
+    "name": "Extended Light Mag I",
+    "file": "items/extended-light-mag-i.png"
+  },
+  {
+    "name": "Extended Light Mag II",
+    "file": "items/extended-light-mag-ii.png"
+  },
+  {
+    "name": "Extended Light Mag III",
+    "file": "items/extended-light-mag-iii.png"
+  },
+  {
+    "name": "Extended Medium Mag I",
+    "file": "items/extended-medium-mag-i.png"
+  },
+  {
+    "name": "Extended Medium Mag II",
+    "file": "items/extended-medium-mag-ii.png"
+  },
+  {
+    "name": "Extended Medium Mag III",
+    "file": "items/extended-medium-mag-iii.png"
+  },
+  {
+    "name": "Extended Shotgun Mag I",
+    "file": "items/extended-shotgun-mag-i.png"
+  },
+  {
+    "name": "Extended Shotgun Mag II",
+    "file": "items/extended-shotgun-mag-ii.png"
+  },
+  {
+    "name": "Extended Shotgun Mag III",
+    "file": "items/extended-shotgun-mag-iii.png"
+  },
+  {
+    "name": "Fabric",
+    "file": "items/fabric.png"
+  },
+  {
+    "name": "Faded Photograph",
+    "file": "items/faded-photograph.png"
+  },
+  {
+    "name": "Fertilizer",
+    "file": "items/fertilizer.png"
+  },
+  {
+    "name": "Film Reel",
+    "file": "items/film-reel.png"
+  },
+  {
+    "name": "Fine Wristwatch",
+    "file": "items/fine-wristwatch.png"
+  },
+  {
+    "name": "Fireball Burner",
+    "file": "items/fireball-burner.png"
+  },
+  {
+    "name": "Flame Spray",
+    "file": "items/flame-spray.png"
+  },
+  {
+    "name": "Flow Controller",
+    "file": "items/flow-controller.png"
+  },
+  {
+    "name": "Free Loadout Augment",
+    "file": "items/free-loadout-augment.png"
+  },
+  {
+    "name": "Frequency Modulation Box",
+    "file": "items/frequency-modulation-box.png"
+  },
+  {
+    "name": "Fried Motherboard",
+    "file": "items/fried-motherboard.png"
+  },
+  {
+    "name": "Fruit Mix",
+    "file": "items/fruit-mix.png"
+  },
+  {
+    "name": "Frying Pan",
+    "file": "items/frying-pan.png"
+  },
+  {
+    "name": "Garlic Press",
+    "file": "items/garlic-press.png"
+  },
+  {
+    "name": "Gas Grenade Trap",
+    "file": "items/gas-grenade-trap.png"
+  },
+  {
+    "name": "Gas Grenade",
+    "file": "items/gas-grenade.png"
+  },
+  {
+    "name": "Gas Mine",
+    "file": "items/gas-mine.png"
+  },
+  {
+    "name": "Geiger Counter",
+    "file": "items/geiger-counter.png"
+  },
+  {
+    "name": "Great Mullein",
+    "file": "items/great-mullein.png"
+  },
+  {
+    "name": "Headphones",
+    "file": "items/headphones.png"
+  },
+  {
+    "name": "Heavy Fuze Grenade",
+    "file": "items/heavy-fuze-grenade.png"
+  },
+  {
+    "name": "Heavy Gun Parts",
+    "file": "items/heavy-gun-parts.png"
+  },
+  {
+    "name": "Heavy Shield",
+    "file": "items/heavy-shield.png"
+  },
+  {
+    "name": "Herbal Bandage",
+    "file": "items/herbal-bandage.png"
+  },
+  {
+    "name": "Horizontal Grip",
+    "file": "items/horizontal-grip.png"
+  },
+  {
+    "name": "Hornet Driver",
+    "file": "items/hornet-driver.png"
+  },
+  {
+    "name": "Household Cleaner",
+    "file": "items/household-cleaner.png"
+  },
+  {
+    "name": "Humidifier",
+    "file": "items/humidifier.png"
+  },
+  {
+    "name": "Ice Cream Scooper",
+    "file": "items/ice-cream-scooper.png"
+  },
+  {
+    "name": "Impure ARC Coolant",
+    "file": "items/impure-arc-coolant.png"
+  },
+  {
+    "name": "Industrial Battery",
+    "file": "items/industrial-battery.png"
+  },
+  {
+    "name": "Industrial Charger",
+    "file": "items/industrial-charger.png"
+  },
+  {
+    "name": "Industrial Magnet",
+    "file": "items/industrial-magnet.png"
+  },
+  {
+    "name": "Ion Sputter",
+    "file": "items/ion-sputter.png"
+  },
+  {
+    "name": "Jolt Mine",
+    "file": "items/jolt-mine.png"
+  },
+  {
+    "name": "Jupiter",
+    "file": "items/jupiter.png"
+  },
+  {
+    "name": "Kinetic Converter",
+    "file": "items/kinetic-converter.png"
+  },
+  {
+    "name": "Laboratory Reagents",
+    "file": "items/laboratory-reagents.png"
+  },
+  {
+    "name": "Lance's Mixtape (5th Edition)",
+    "file": "items/lance-s-mixtape-5th-edition.png"
+  },
+  {
+    "name": "Launcher Ammo",
+    "file": "items/launcher-ammo.png"
+  },
+  {
+    "name": "Leaper Pulse Unit",
+    "file": "items/leaper-pulse-unit.png"
+  },
+  {
+    "name": "Lemon",
+    "file": "items/lemon.png"
+  },
+  {
+    "name": "Light Bulb",
+    "file": "items/light-bulb.png"
+  },
+  {
+    "name": "Light Gun Parts",
+    "file": "items/light-gun-parts.png"
+  },
+  {
+    "name": "Light Impact Grenade",
+    "file": "items/light-impact-grenade.png"
+  },
+  {
+    "name": "Light Shield",
+    "file": "items/light-shield.png"
+  },
+  {
+    "name": "Lightweight Stock",
+    "file": "items/lightweight-stock.png"
+  },
+  {
+    "name": "Looting Mk. 1",
+    "file": "items/looting-mk-1.png"
+  },
+  {
+    "name": "Looting Mk. 2",
+    "file": "items/looting-mk-2.png"
+  },
+  {
+    "name": "Looting Mk. 3 (Cautious)",
+    "file": "items/looting-mk-3-cautious.png"
+  },
+  {
+    "name": "Looting Mk. 3 (Survivor)",
+    "file": "items/looting-mk-3-survivor.png"
+  },
+  {
+    "name": "Lure Grenade Trap",
+    "file": "items/lure-grenade-trap.png"
+  },
+  {
+    "name": "Lure Grenade",
+    "file": "items/lure-grenade.png"
+  },
+  {
+    "name": "Magnet",
+    "file": "items/magnet.png"
+  },
+  {
+    "name": "Magnetic Accelerator",
+    "file": "items/magnetic-accelerator.png"
+  },
+  {
+    "name": "Magnetron",
+    "file": "items/magnetron.png"
+  },
+  {
+    "name": "Matriarch Reactor",
+    "file": "items/matriarch-reactor.png"
+  },
+  {
+    "name": "Mechanical Components",
+    "file": "items/mechanical-components.png"
+  },
+  {
+    "name": "Medium Gun Parts",
+    "file": "items/medium-gun-parts.png"
+  },
+  {
+    "name": "Medium Shield",
+    "file": "items/medium-shield.png"
+  },
+  {
+    "name": "Metal Brackets",
+    "file": "items/metal-brackets.png"
+  },
+  {
+    "name": "Metal Parts",
+    "file": "items/metal-parts.png"
+  },
+  {
+    "name": "Microscope",
+    "file": "items/microscope.png"
+  },
+  {
+    "name": "Mini Centrifuge",
+    "file": "items/mini-centrifuge.png"
+  },
+  {
+    "name": "Mod Components",
+    "file": "items/mod-components.png"
+  },
+  {
+    "name": "Moss",
+    "file": "items/moss.png"
+  },
+  {
+    "name": "Motor",
+    "file": "items/motor.png"
+  },
+  {
+    "name": "Mushroom",
+    "file": "items/mushroom.png"
+  },
+  {
+    "name": "Music Album",
+    "file": "items/music-album.png"
+  },
+  {
+    "name": "Music Box",
+    "file": "items/music-box.png"
+  },
+  {
+    "name": "Muzzle Brake I",
+    "file": "items/muzzle-brake-i.png"
+  },
+  {
+    "name": "Muzzle Brake II",
+    "file": "items/muzzle-brake-ii.png"
+  },
+  {
+    "name": "Muzzle Brake III",
+    "file": "items/muzzle-brake-iii.png"
+  },
+  {
+    "name": "Noisemaker",
+    "file": "items/noisemaker.png"
+  },
+  {
+    "name": "Number Plate",
+    "file": "items/number-plate.png"
+  },
+  {
+    "name": "Oil",
+    "file": "items/oil.png"
+  },
+  {
+    "name": "Olives",
+    "file": "items/olives.png"
+  },
+  {
+    "name": "Padded Stock",
+    "file": "items/padded-stock.png"
+  },
+  {
+    "name": "Painted Box",
+    "file": "items/painted-box.png"
+  },
+  {
+    "name": "Patrol Car Key",
+    "file": "items/patrol-car-key.png"
+  },
+  {
+    "name": "Photoelectric Cloak",
+    "file": "items/photoelectric-cloak.png"
+  },
+  {
+    "name": "Plastic Parts",
+    "file": "items/plastic-parts.png"
+  },
+  {
+    "name": "Playing Cards",
+    "file": "items/playing-cards.png"
+  },
+  {
+    "name": "Polluted Air Filter",
+    "file": "items/polluted-air-filter.png"
+  },
+  {
+    "name": "Pop Trigger",
+    "file": "items/pop-trigger.png"
+  },
+  {
+    "name": "Portable TV",
+    "file": "items/portable-tv.png"
+  },
+  {
+    "name": "Pottery",
+    "file": "items/pottery.png"
+  },
+  {
+    "name": "Power Bank",
+    "file": "items/power-bank.png"
+  },
+  {
+    "name": "Power Cable",
+    "file": "items/power-cable.png"
+  },
+  {
+    "name": "Power Rod",
+    "file": "items/power-rod.png"
+  },
+  {
+    "name": "Prickly Pear",
+    "file": "items/prickly-pear.png"
+  },
+  {
+    "name": "Processor",
+    "file": "items/processor.png"
+  },
+  {
+    "name": "Projector",
+    "file": "items/projector.png"
+  },
+  {
+    "name": "Pulse Mine",
+    "file": "items/pulse-mine.png"
+  },
+  {
+    "name": "Queen Reactor",
+    "file": "items/queen-reactor.png"
+  },
+  {
+    "name": "Radio Relay",
+    "file": "items/radio-relay.png"
+  },
+  {
+    "name": "Radio",
+    "file": "items/radio.png"
+  },
+  {
+    "name": "Raider Hatch Key",
+    "file": "items/raider-hatch-key.png"
+  },
+  {
+    "name": "Recorder",
+    "file": "items/recorder.png"
+  },
+  {
+    "name": "Red Coral Jewelry",
+    "file": "items/red-coral-jewelry.png"
+  },
+  {
+    "name": "Remote Control",
+    "file": "items/remote-control.png"
+  },
+  {
+    "name": "Remote Raider Flare",
+    "file": "items/remote-raider-flare.png"
+  },
+  {
+    "name": "Resin",
+    "file": "items/resin.png"
+  },
+  {
+    "name": "Ripped Safety Vest",
+    "file": "items/ripped-safety-vest.png"
+  },
+  {
+    "name": "Rocket Thruster",
+    "file": "items/rocket-thruster.png"
+  },
+  {
+    "name": "Rocketeer Driver",
+    "file": "items/rocketeer-driver.png"
+  },
+  {
+    "name": "Roots",
+    "file": "items/roots.png"
+  },
+  {
+    "name": "Rope",
+    "file": "items/rope.png"
+  },
+  {
+    "name": "Rosary",
+    "file": "items/rosary.png"
+  },
+  {
+    "name": "Rotary Encoder",
+    "file": "items/rotary-encoder.png"
+  },
+  {
+    "name": "Rubber Duck",
+    "file": "items/rubber-duck.png"
+  },
+  {
+    "name": "Rubber Pad",
+    "file": "items/rubber-pad.png"
+  },
+  {
+    "name": "Rubber Parts",
+    "file": "items/rubber-parts.png"
+  },
+  {
+    "name": "Ruined Accordion",
+    "file": "items/ruined-accordion.png"
+  },
+  {
+    "name": "Ruined Augment",
+    "file": "items/ruined-augment.png"
+  },
+  {
+    "name": "Ruined Baton",
+    "file": "items/ruined-baton.png"
+  },
+  {
+    "name": "Ruined Handcuffs",
+    "file": "items/ruined-handcuffs.png"
+  },
+  {
+    "name": "Ruined Parachute",
+    "file": "items/ruined-parachute.png"
+  },
+  {
+    "name": "Ruined Riot Shield",
+    "file": "items/ruined-riot-shield.png"
+  },
+  {
+    "name": "Ruined Tactical Vest",
+    "file": "items/ruined-tactical-vest.png"
+  },
+  {
+    "name": "Rusted Bolts",
+    "file": "items/rusted-bolts.png"
+  },
+  {
+    "name": "Rusted Gear",
+    "file": "items/rusted-gear.png"
+  },
+  {
+    "name": "Rusted Shut Medical Kit",
+    "file": "items/rusted-shut-medical-kit.png"
+  },
+  {
+    "name": "Rusted Tools",
+    "file": "items/rusted-tools.png"
+  },
+  {
+    "name": "Rusty ARC Steel",
+    "file": "items/rusty-arc-steel.png"
+  },
+  {
+    "name": "Sample Cleaner",
+    "file": "items/sample-cleaner.png"
+  },
+  {
+    "name": "Seeker Grenade",
+    "file": "items/seeker-grenade.png"
+  },
+  {
+    "name": "Sensors",
+    "file": "items/sensors.png"
+  },
+  {
+    "name": "Sentinel Firing Core",
+    "file": "items/sentinel-firing-core.png"
+  },
+  {
+    "name": "Shield Recharger",
+    "file": "items/shield-recharger.png"
+  },
+  {
+    "name": "Shotgun Choke I",
+    "file": "items/shotgun-choke-i.png"
+  },
+  {
+    "name": "Shotgun Choke II",
+    "file": "items/shotgun-choke-ii.png"
+  },
+  {
+    "name": "Shotgun Choke III",
+    "file": "items/shotgun-choke-iii.png"
+  },
+  {
+    "name": "Shotgun Silencer",
+    "file": "items/shotgun-silencer.png"
+  },
+  {
+    "name": "Showstopper",
+    "file": "items/showstopper.png"
+  },
+  {
+    "name": "Shrapnel Grenade",
+    "file": "items/shrapnel-grenade.png"
+  },
+  {
+    "name": "Shredder Gyro",
+    "file": "items/shredder-gyro.png"
+  },
+  {
+    "name": "Signal Amplifier",
+    "file": "items/signal-amplifier.png"
+  },
+  {
+    "name": "Silencer I",
+    "file": "items/silencer-i.png"
+  },
+  {
+    "name": "Silencer II",
+    "file": "items/silencer-ii.png"
+  },
+  {
+    "name": "Silencer III",
+    "file": "items/silencer-iii.png"
+  },
+  {
+    "name": "Silver Teaspoon Set",
+    "file": "items/silver-teaspoon-set.png"
+  },
+  {
+    "name": "Smoke Grenade Trap",
+    "file": "items/smoke-grenade-trap.png"
+  },
+  {
+    "name": "Smoke Grenade",
+    "file": "items/smoke-grenade.png"
+  },
+  {
+    "name": "Snap Blast Grenade",
+    "file": "items/snap-blast-grenade.png"
+  },
+  {
+    "name": "Snap Hook",
+    "file": "items/snap-hook.png"
+  },
+  {
+    "name": "Snitch Scanner",
+    "file": "items/snitch-scanner.png"
+  },
+  {
+    "name": "Speaker Component",
+    "file": "items/speaker-component.png"
+  },
+  {
+    "name": "Spectrometer",
+    "file": "items/spectrometer.png"
+  },
+  {
+    "name": "Spectrum Analyzer",
+    "file": "items/spectrum-analyzer.png"
+  },
+  {
+    "name": "Spotter Relay",
+    "file": "items/spotter-relay.png"
+  },
+  {
+    "name": "Spring Cushion",
+    "file": "items/spring-cushion.png"
+  },
+  {
+    "name": "Stable Stock I",
+    "file": "items/stable-stock-i.png"
+  },
+  {
+    "name": "Stable Stock II",
+    "file": "items/stable-stock-ii.png"
+  },
+  {
+    "name": "Stable Stock III",
+    "file": "items/stable-stock-iii.png"
+  },
+  {
+    "name": "Statuette",
+    "file": "items/statuette.png"
+  },
+  {
+    "name": "Steel Spring",
+    "file": "items/steel-spring.png"
+  },
+  {
+    "name": "Sterilized Bandage",
+    "file": "items/sterilized-bandage.png"
+  },
+  {
+    "name": "Surge Shield Recharger",
+    "file": "items/surge-shield-recharger.png"
+  },
+  {
+    "name": "Surveyor Vault",
+    "file": "items/surveyor-vault.png"
+  },
+  {
+    "name": "Synthesized Fuel",
+    "file": "items/synthesized-fuel.png"
+  },
+  {
+    "name": "Syringe",
+    "file": "items/syringe.png"
+  },
+  {
+    "name": "Tactical Mk. 1",
+    "file": "items/tactical-mk-1.png"
+  },
+  {
+    "name": "Tactical Mk. 2",
+    "file": "items/tactical-mk-2.png"
+  },
+  {
+    "name": "Tactical Mk. 3 (Defensive)",
+    "file": "items/tactical-mk-3-defensive.png"
+  },
+  {
+    "name": "Tactical Mk. 3 (Healing)",
+    "file": "items/tactical-mk-3-healing.png"
+  },
+  {
+    "name": "Tagging Grenade",
+    "file": "items/tagging-grenade.png"
+  },
+  {
+    "name": "Tattered ARC Lining",
+    "file": "items/tattered-arc-lining.png"
+  },
+  {
+    "name": "Tattered Clothes",
+    "file": "items/tattered-clothes.png"
+  },
+  {
+    "name": "Telemetry Transceiver",
+    "file": "items/telemetry-transceiver.png"
+  },
+  {
+    "name": "Thermostat",
+    "file": "items/thermostat.png"
+  },
+  {
+    "name": "Tick Pod",
+    "file": "items/tick-pod.png"
+  },
+  {
+    "name": "Toaster",
+    "file": "items/toaster.png"
+  },
+  {
+    "name": "Torn Blanket",
+    "file": "items/torn-blanket.png"
+  },
+  {
+    "name": "Torn Book",
+    "file": "items/torn-book.png"
+  },
+  {
+    "name": "Trailblazer",
+    "file": "items/trailblazer.png"
+  },
+  {
+    "name": "Turbo Pump",
+    "file": "items/turbo-pump.png"
+  },
+  {
+    "name": "Unusable Weapon",
+    "file": "items/unusable-weapon.png"
+  },
+  {
+    "name": "Vase",
+    "file": "items/vase.png"
+  },
+  {
+    "name": "Vertical Grip I",
+    "file": "items/vertical-grip-i.png"
+  },
+  {
+    "name": "Vertical Grip II",
+    "file": "items/vertical-grip-ii.png"
+  },
+  {
+    "name": "Vertical Grip III",
+    "file": "items/vertical-grip-iii.png"
+  },
+  {
+    "name": "Very Comfortable Pillow",
+    "file": "items/very-comfortable-pillow.png"
+  },
+  {
+    "name": "Vita Shot",
+    "file": "items/vita-shot.png"
+  },
+  {
+    "name": "Vita Spray",
+    "file": "items/vita-spray.png"
+  },
+  {
+    "name": "Volcanic Rock",
+    "file": "items/volcanic-rock.png"
+  },
+  {
+    "name": "Voltage Converter",
+    "file": "items/voltage-converter.png"
+  },
+  {
+    "name": "Wasp Driver",
+    "file": "items/wasp-driver.png"
+  },
+  {
+    "name": "Water Filter",
+    "file": "items/water-filter.png"
+  },
+  {
+    "name": "Water Pump",
+    "file": "items/water-pump.png"
+  },
+  {
+    "name": "Wires",
+    "file": "items/wires.png"
+  },
+  {
+    "name": "Wolfpack",
+    "file": "items/wolfpack.png"
+  },
+  {
+    "name": "Zipline",
+    "file": "items/zipline.png"
+  }
+]
