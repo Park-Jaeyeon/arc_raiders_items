@@ -128,13 +128,14 @@ const findBestBounds = (imageData: ImageData): Rect => {
       const h = b.maxY - b.minY + 1;
       const area = w * h;
       
-      // 조건 강화: 화면의 10% 미만인 너무 작은 덩어리는 무시 (부분 감지 방지)
-      if (area < size * 0.10 || area > size * 0.95) return;
+      // 조건 완화: 화면의 5% 이상이면 후보로 인정 (너무 작지만 않으면 됨)
+      if (area < size * 0.05 || area > size * 0.98) return;
 
       const aspect = w / h;
       
-      // 비율 조건 강화: 7:4 (1.75) 기준. 세로로 긴 것(1.3 미만)은 인벤토리일 수 없음
-      if (aspect < 1.3 || aspect > 2.5) return;
+      // 비율 조건 대폭 완화: 1.0 ~ 3.5 허용 (정사각형 ~ 가로로 긴 형태 모두 허용)
+      // "배열에 강박증을 가지지 않음"
+      if (aspect < 1.0 || aspect > 3.5) return;
 
       const centerX = (b.minX + b.maxX) / 2;
       const centerY = (b.minY + b.maxY) / 2;
@@ -145,12 +146,13 @@ const findBestBounds = (imageData: ImageData): Rect => {
       const distNorm = Math.sqrt(Math.pow(centerX - imgCenterX, 2) + Math.pow(centerY - imgCenterY, 2)) / Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
       const centerScore = 1 - distNorm;
 
-      // 비율 점수
+      // 비율 점수 (목표 비율 1.75와의 차이)
       const aspectScore = 1 - Math.abs(aspect - TARGET_ASPECT) / TARGET_ASPECT; 
       const areaScore = area / size;
 
-      // 종합 점수: 비율(Aspect) 점수 비중을 높여서 7x4 모양을 선호하게 함
-      const score = centerScore * 2.0 + areaScore * 2.0 + aspectScore * 5.0;
+      // 종합 점수: 비율 점수(aspectScore)의 가중치를 낮춤 (강박증 해제)
+      // 크기(areaScore)와 중앙 정렬(centerScore)을 더 중요하게 봄
+      const score = centerScore * 4.0 + areaScore * 3.0 + aspectScore * 1.0;
 
       if (score > bestScore) {
         bestScore = score;
