@@ -63,7 +63,7 @@ export function ResultTable({ items }: Props) {
                   <div className="w-10 h-10 bg-neutral-800 rounded overflow-hidden border border-neutral-700">
                 <img 
                   src={`${import.meta.env.BASE_URL}items/${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}.png`}
-                  alt={result.label} 
+                  alt={item.name} 
                   className="w-12 h-12 object-contain rounded-md border border-white/10 bg-black/20"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
