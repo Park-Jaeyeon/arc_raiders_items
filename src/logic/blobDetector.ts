@@ -77,8 +77,8 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
       binary[i] = gray > th ? 1 : 0;
     }
 
-    // Dilation: 6 (조각난 아이템을 하나로 합치기 위해 적당히 키움)
-    const dilated = dilate(binary, width, height, 6);
+    // Dilation: 8 (조각난 아이템을 하나로 합치기 위해 더 키움)
+    const dilated = dilate(binary, width, height, 8);
 
     // CCL (Connected Component Labeling)
     const labels = new Int32Array(size).fill(0);
@@ -168,14 +168,21 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
     let shouldAdd = true;
 
     for (const existing of finalSlots) {
-      const overlap = getOverlapRatio(candidate, existing);
-      
-      // 1. 이미 등록된 큰 박스 안에 포함되거나 (Overlap > 0.8)
-      // 2. 서로 너무 많이 겹치면 (Overlap > 0.5)
-      // -> 현재의 작은 박스(candidate)를 버림
-      if (overlap > 0.5) {
-        shouldAdd = false;
-        break;
+      // 두 사각형의 교차 영역 계산
+      const x1 = Math.max(candidate.x, existing.x);
+      const y1 = Math.max(candidate.y, existing.y);
+      const x2 = Math.min(candidate.x + candidate.width, existing.x + existing.width);
+      const y2 = Math.min(candidate.y + candidate.height, existing.y + existing.height);
+
+      if (x2 > x1 && y2 > y1) {
+        const intersection = (x2 - x1) * (y2 - y1);
+        const candidateArea = candidate.width * candidate.height;
+        
+        // 교차 영역이 후보(작은 박스) 면적의 50% 이상이면 중복/포함으로 간주하고 버림
+        if (intersection / candidateArea > 0.5) {
+          shouldAdd = false;
+          break;
+        }
       }
     }
 
