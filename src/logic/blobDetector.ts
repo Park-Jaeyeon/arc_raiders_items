@@ -4,6 +4,7 @@
  * 1. 어두운 아이템과 밝은 아이템 모두 감지
  * 2. 중복되거나 내부에 포함된 박스 제거
  * 3. 조각난 아이템 최소화
+ * 4. 격자 보정(Grid Refinement)을 통해 들쭉날쭉한 박스 크기와 위치 정렬
  */
 
 export interface Rect {
@@ -38,6 +39,57 @@ const dilate = (data: Uint8Array, width: number, height: number, kernelSize: num
   return output;
 };
 
+// 중앙값 계산 헬퍼
+const getMedian = (values: number[]) => {
+  if (values.length === 0) return 0;
+  values.sort((a, b) => a - b);
+  const mid = Math.floor(values.length / 2);
+  return values.length % 2 !== 0 ? values[mid] : (values[mid - 1] + values[mid]) / 2;
+};
+
+// 격자 보정 (Grid Refinement)
+const refineToGrid = (slots: Rect[], width: number, height: number): Rect[] => {
+  if (slots.length < 2) return slots;
+
+  // 1. 표준 단위 크기(Unit Size) 추정
+  const unitW = getMedian(slots.map(s => s.width));
+  const unitH = getMedian(slots.map(s => s.height));
+
+  if (unitW === 0 || unitH === 0) return slots;
+
+  // 2. 스냅(Snap) 및 보정
+  return slots.map(slot => {
+    // 너비/높이가 단위 크기의 몇 배인지 계산 (1.0, 2.0, ...)
+    let colSpan = Math.round(slot.width / unitW);
+    let rowSpan = Math.round(slot.height / unitH);
+
+    // 최소 1칸 보장
+    colSpan = Math.max(1, colSpan);
+    rowSpan = Math.max(1, rowSpan);
+
+    // 표준 크기로 재설정 (약간의 여유를 줘서 꽉 차게)
+    // 원래 감지된 박스는 아이콘만 잡아서 작을 수 있으므로, 표준 크기만큼 확 키워줌
+    // 단, 너무 커지지 않도록 1.1배 정도까지만
+    const scaleFactor = 1.0; 
+    const newW = unitW * colSpan * scaleFactor; 
+    const newH = unitH * rowSpan * scaleFactor;
+
+    // 중심점 유지하면서 크기 변경
+    const cx = slot.x + slot.width / 2;
+    const cy = slot.y + slot.height / 2;
+    
+    let newX = cx - newW / 2;
+    let newY = cy - newH / 2;
+
+    return {
+      x: newX,
+      y: newY,
+      width: newW,
+      height: newH
+    };
+  });
+};
+
 export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rect[] => {
   const { width, height } = imageData;
   const size = width * height;
@@ -45,9 +97,6 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
   let allCandidates: Rect[] = [];
 
   // 1. 다중 Threshold 루프 (어두운 아이템 ~ 밝은 아이템 모두 포착)
-  // 30: 어두운 배경 속 아이템
-  // 60~90: 일반적인 아이템
-  // 120~150: 밝은 흰색/회색 컨테이너 및 하이라이트
   const thresholds = [30, 60, 90, 120, 150]; 
 
   for (const th of thresholds) {
@@ -161,7 +210,8 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
         const intersection = (x2 - x1) * (y2 - y1);
         const candidateArea = candidate.width * candidate.height;
         
-        // 교차 영역이 75% 이상이면 중복으로 간주
+        // 교차 영역이 후보(작은 박스) 면적의 75% 이상일 때만 중복/포함으로 간주
+        // (아이템들이 다닥다닥 붙어있을 수 있으므로 기준을 높임)
         if (intersection / candidateArea > 0.75) {
           shouldAdd = false;
           break;
@@ -174,22 +224,22 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
     }
   }
 
-  // 3. 통계적 필터링 (Median Size Filtering) - "작은 박스" 문제 해결
-  // 감지된 박스들의 너비/높이 중앙값을 구해서, 너무 작은 박스(노이즈)를 제거
+  // 3. 통계적 필터링 & 격자 보정
   if (nmsSlots.length === 0) return [];
-
   const widths = nmsSlots.map(s => s.width).sort((a, b) => a - b);
   const heights = nmsSlots.map(s => s.height).sort((a, b) => a - b);
   const mid = Math.floor(nmsSlots.length / 2);
   const medianW = widths[mid];
   const medianH = heights[mid];
 
-  const finalSlots = nmsSlots.filter(s => {
-    // 중앙값의 30%보다 작으면 노이즈일 확률이 높음 (완화)
-    // 하지만 너무 작은 노이즈는 여전히 걸러야 함
+  let finalSlots = nmsSlots.filter(s => {
+    // 중앙값의 30%보다 작으면 노이즈일 확률이 높음
     if (s.width < medianW * 0.3 || s.height < medianH * 0.3) return false;
     return true;
   });
+
+  // 격자 보정 적용 (Grid Refinement)
+  finalSlots = refineToGrid(finalSlots, width, height);
 
   // 4. 정렬 (상단 -> 하단, 좌 -> 우)
   finalSlots.sort((a, b) => {
