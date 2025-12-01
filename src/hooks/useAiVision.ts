@@ -53,7 +53,7 @@ function getWorker(): Worker {
   if (!globalWorker) {
     globalWorker = new VisionWorker();
 
-    globalWorker.onerror = (error) => {
+    globalWorker!.onerror = (error) => {
       console.error("[AiVision] Worker Error Details:", {
         message: error.message,
         filename: error.filename,
@@ -64,7 +64,7 @@ function getWorker(): Worker {
     };
 
   // Update worker message handler to handle 'results' property
-    globalWorker.onmessage = (e) => {
+    globalWorker!.onmessage = (e) => {
       const { id, status, result, results, error } = e.data;
 
       // Handle initialization ready message
