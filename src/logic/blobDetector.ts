@@ -48,7 +48,7 @@ const getMedian = (values: number[]) => {
 };
 
 // 격자 보정 (Grid Refinement)
-const refineToGrid = (slots: Rect[], width: number, height: number): Rect[] => {
+const refineToGrid = (slots: Rect[]): Rect[] => {
   if (slots.length < 2) return slots;
 
   // 1. 표준 단위 크기(Unit Size) 추정
@@ -239,9 +239,9 @@ export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rec
   });
 
   // 격자 보정 적용 (Grid Refinement)
-  finalSlots = refineToGrid(finalSlots, width, height);
+  finalSlots = refineToGrid(finalSlots);
 
-  // 4. 정렬 (상단 -> 하단, 좌 -> 우)
+  // 5. 정렬
   finalSlots.sort((a, b) => {
     const yDiff = Math.abs(a.y - b.y);
     if (yDiff < height * 0.05) {
