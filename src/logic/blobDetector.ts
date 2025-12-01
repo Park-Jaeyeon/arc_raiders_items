@@ -1,7 +1,7 @@
 /**
- * Inventory grid detector
- * 목표: 항상 7x4(28칸)의 균일한 슬롯을 반환.
- * 절차: 다중 Threshold 이진화 -> Morphological Dilation (병합) -> 후보 사각형 추출 -> 비율/크기 점수 평가 -> 최적 바운딩 박스 -> 7x4 분할
+ * Inventory Item Detector (Dynamic)
+ * 목표: 고정된 그리드(7x4)가 아닌, 화면에 존재하는 개별 아이템 슬롯들을 유연하게 감지.
+ * 1x1, 2x2, 7x4 등 어떤 배열이든 상관없이 아이템이 있는 영역(Blob)을 각각 추출함.
  */
 
 export interface Rect {
@@ -13,12 +13,7 @@ export interface Rect {
 
 export type BoundingBox = Rect;
 
-const COLS = 7;
-const ROWS = 4;
-const PADDING_PX = 8;
-const TARGET_ASPECT = COLS / ROWS; // 1.75
-
-// Morphological Dilation (팽창) - 흩어진 슬롯을 하나로 뭉침
+// Morphological Dilation (팽창)
 const dilate = (data: Uint8Array, width: number, height: number, kernelSize: number) => {
   const output = new Uint8Array(data.length);
   const offset = Math.floor(kernelSize / 2);
@@ -42,160 +37,140 @@ const dilate = (data: Uint8Array, width: number, height: number, kernelSize: num
 };
 
 /**
- * 다중 Threshold를 사용하여 가장 적합한 인벤토리 영역을 찾는다.
- * 점수 기준: 
- * 1. 비율(Aspect Ratio): 7:4 (1.75)에 가까울수록 높은 점수
- * 2. 크기(Area): 너무 작지 않고 화면을 적절히 채우는 크기
+ * 개별 아이템 영역 감지
  */
-const findBestBounds = (imageData: ImageData): Rect => {
+export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rect[] => {
   const { width, height } = imageData;
   const size = width * height;
   
-  let bestRect: Rect = { x: 0, y: 0, width, height };
-  let bestScore = -Infinity;
+  // 1. 이진화 (Thresholding)
+  // 여러 임계값을 시도하는 대신, 중간값 하나를 사용하거나 적응형으로 가는 게 좋지만,
+  // 여기서는 밝은 아이템을 잡기 위해 약간 높은 값을 기본으로 사용.
+  const th = 45; 
+  const binary = new Uint8Array(size);
+  
+  for (let i = 0; i < size; i++) {
+    const r = imageData.data[i * 4];
+    const g = imageData.data[i * 4 + 1];
+    const b = imageData.data[i * 4 + 2];
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    binary[i] = gray > th ? 1 : 0;
+  }
 
-  // 1. 다양한 임계값 시도 (어두운 배경 노이즈 제거를 위해 최소값 상향)
-  const thresholds = [30, 50, 70, 90, 110, 130, 150, 180, 210];
+  // 2. Dilation (팽창) - 아주 작게 적용
+  // 아이템 내부의 빈 공간은 메우되, 아이템끼리는 붙지 않도록 커널 크기를 2~3으로 설정.
+  const dilated = dilate(binary, width, height, 3);
 
-  for (const th of thresholds) {
-    const binary = new Uint8Array(size);
-    for (let i = 0; i < size; i++) {
-      const r = imageData.data[i * 4];
-      const g = imageData.data[i * 4 + 1];
-      const b = imageData.data[i * 4 + 2];
-      // 단순 평균보다 ITU-R BT.601 공식 사용
-      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-      binary[i] = gray > th ? 1 : 0;
-    }
+  // 3. CCL (Connected Component Labeling)
+  const labels = new Int32Array(size).fill(0);
+  let nextLabel = 1;
+  const parent: number[] = [];
+  const find = (x: number): number => {
+    if (parent[x] === x) return x;
+    return parent[x] = find(parent[x]);
+  };
+  const unite = (a: number, b: number) => {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra !== rb) parent[rb] = ra;
+  };
 
-    // Dilation 적용 (커널 크기 재조정: 8 -> 12, 흩어진 아이템을 더 잘 뭉치게 함)
-    const dilated = dilate(binary, width, height, 12);
-
-    // 간단한 CCL (Connected Component Labeling)
-    const labels = new Int32Array(size).fill(0);
-    let nextLabel = 1;
-    const parent: number[] = [];
-    const find = (x: number): number => {
-      if (parent[x] === x) return x;
-      return parent[x] = find(parent[x]);
-    };
-    const unite = (a: number, b: number) => {
-      const ra = find(a);
-      const rb = find(b);
-      if (ra !== rb) parent[rb] = ra;
-    };
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const idx = y * width + x;
-        if (dilated[idx] === 0) continue;
-        const left = x > 0 ? labels[idx - 1] : 0;
-        const top = y > 0 ? labels[idx - width] : 0;
-        if (left === 0 && top === 0) {
-          labels[idx] = nextLabel;
-          parent[nextLabel] = nextLabel;
-          nextLabel++;
-        } else if (left !== 0 && top === 0) labels[idx] = left;
-        else if (left === 0 && top !== 0) labels[idx] = top;
-        else {
-          labels[idx] = Math.min(left, top);
-          unite(left, top);
-        }
-      }
-    }
-
-    const blobs = new Map<number, { minX: number; maxX: number; minY: number; maxY: number; area: number }>();
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const idx = y * width + x;
-        if (labels[idx] === 0) continue;
-        const root = find(labels[idx]);
-        const blob = blobs.get(root);
-        if (!blob) blobs.set(root, { minX: x, maxX: x, minY: y, maxY: y, area: 1 });
-        else {
-          blob.minX = Math.min(blob.minX, x);
-          blob.maxX = Math.max(blob.maxX, x);
-          blob.minY = Math.min(blob.minY, y);
-          blob.maxY = Math.max(blob.maxY, y);
-          blob.area++;
-        }
-      }
-    }
-
-    // 후보 평가
-    blobs.forEach(b => {
-      const w = b.maxX - b.minX + 1;
-      const h = b.maxY - b.minY + 1;
-      const area = w * h;
+  // 1-Pass
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      if (dilated[idx] === 0) continue;
       
-      // 조건 완화: 화면의 5% 이상이면 후보로 인정 (너무 작지만 않으면 됨)
-      if (area < size * 0.05 || area > size * 0.98) return;
+      const left = x > 0 ? labels[idx - 1] : 0;
+      const top = y > 0 ? labels[idx - width] : 0;
 
-      const aspect = w / h;
-      
-      // 비율 조건 대폭 완화: 1.0 ~ 3.5 허용 (정사각형 ~ 가로로 긴 형태 모두 허용)
-      // "배열에 강박증을 가지지 않음"
-      if (aspect < 1.0 || aspect > 3.5) return;
-
-      const centerX = (b.minX + b.maxX) / 2;
-      const centerY = (b.minY + b.maxY) / 2;
-      const imgCenterX = width / 2;
-      const imgCenterY = height / 2;
-
-      // 중앙 거리 점수
-      const distNorm = Math.sqrt(Math.pow(centerX - imgCenterX, 2) + Math.pow(centerY - imgCenterY, 2)) / Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));
-      const centerScore = 1 - distNorm;
-
-      // 비율 점수 (목표 비율 1.75와의 차이)
-      const aspectScore = 1 - Math.abs(aspect - TARGET_ASPECT) / TARGET_ASPECT; 
-      const areaScore = area / size;
-
-      // 종합 점수: 비율 점수(aspectScore)의 가중치를 낮춤 (강박증 해제)
-      // 크기(areaScore)와 중앙 정렬(centerScore)을 더 중요하게 봄
-      const score = centerScore * 4.0 + areaScore * 3.0 + aspectScore * 1.0;
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestRect = { x: b.minX, y: b.minY, width: w, height: h };
+      if (left === 0 && top === 0) {
+        labels[idx] = nextLabel;
+        parent[nextLabel] = nextLabel;
+        nextLabel++;
+      } else if (left !== 0 && top === 0) {
+        labels[idx] = left;
+      } else if (left === 0 && top !== 0) {
+        labels[idx] = top;
+      } else {
+        labels[idx] = Math.min(left, top);
+        unite(left, top);
       }
+    }
+  }
+
+  // 2-Pass (Resolve Labels & Build Blobs)
+  const blobs = new Map<number, Rect>();
+  
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      if (labels[idx] === 0) continue;
+      
+      const root = find(labels[idx]);
+      const blob = blobs.get(root);
+      
+      if (!blob) {
+        blobs.set(root, { x: x, y: y, width: 1, height: 1 }); // width/height를 max값 추적용으로 잠시 사용
+      } else {
+        // x, y는 minX, minY
+        // width, height는 maxX, maxY로 사용하여 업데이트
+        blob.x = Math.min(blob.x, x);
+        blob.width = Math.max(blob.width, x); // 임시로 maxX 저장
+        blob.y = Math.min(blob.y, y);
+        blob.height = Math.max(blob.height, y); // 임시로 maxY 저장
+      }
+    }
+  }
+
+  // 4. Blob 필터링 및 변환
+  const validSlots: Rect[] = [];
+  const minArea = size * 0.005; // 화면의 0.5% 이상 (너무 작은 노이즈 제거)
+  const maxArea = size * 0.3;   // 화면의 30% 이하 (배경 전체 제거)
+
+  blobs.forEach((b) => {
+    // 임시 저장된 maxX, maxY를 실제 width, height로 변환
+    const realX = b.x;
+    const realY = b.y;
+    const realW = b.width - b.x + 1;
+    const realH = b.height - b.y + 1;
+
+    const area = realW * realH;
+    const aspect = realW / realH;
+
+    // 조건 1: 크기
+    if (area < minArea || area > maxArea) return;
+
+    // 조건 2: 비율 (아이템은 대체로 정사각형 ~ 직사각형)
+    // 1x1(1.0), 2x1(2.0), 1x2(0.5) 등을 모두 포용하기 위해 범위를 넓게 잡음.
+    if (aspect < 0.4 || aspect > 3.0) return;
+
+    // 조건 3: 화면 가장자리에 붙은 잘린 이미지는 제외 (선택적)
+    const margin = 2;
+    if (realX <= margin || realY <= margin || 
+        realX + realW >= width - margin || realY + realH >= height - margin) {
+      return;
+    }
+
+    validSlots.push({
+      x: realX,
+      y: realY,
+      width: realW,
+      height: realH
     });
-  }
+  });
 
-  // Fallback
-  if (bestScore < 0.3) {
-    return { x: 0, y: 0, width, height };
-  }
-
-  return bestRect;
-};
-
-const sliceIntoGrid = (bounds: Rect): Rect[] => {
-  const cellW = bounds.width / COLS;
-  const cellH = bounds.height / ROWS;
-  // Increase inset to be safer (avoid neighbors)
-  const insetX = Math.min(PADDING_PX, cellW * 0.15); 
-  const insetY = Math.min(PADDING_PX, cellH * 0.15);
-
-  const slots: Rect[] = [];
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const x = bounds.x + c * cellW;
-      const y = bounds.y + r * cellH;
-      slots.push({
-        x: x + insetX,
-        y: y + insetY,
-        width: Math.max(1, cellW - insetX * 2),
-        height: Math.max(1, cellH - insetY * 2),
-      });
+  // 5. 정렬 (상단 -> 하단, 좌 -> 우 순서)
+  // y좌표가 비슷하면 x좌표로 정렬 (줄바꿈 고려)
+  validSlots.sort((a, b) => {
+    const yDiff = Math.abs(a.y - b.y);
+    if (yDiff < height * 0.05) { // 같은 줄(Row)로 간주할 오차 범위
+      return a.x - b.x;
     }
-  }
-  return slots;
-};
+    return a.y - b.y;
+  });
 
-export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rect[] => {
-  // threshold 파라미터는 이제 무시하고 내부적으로 다중 threshold 사용
-  const bounds = findBestBounds(imageData);
-  return sliceIntoGrid(bounds);
+  return validSlots;
 };
 
 export const getItemSlots = async (file: File, threshold: number): Promise<BoundingBox[]> => {
