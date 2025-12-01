@@ -89,7 +89,7 @@ function getWorker(): Worker {
     
     console.log("[AiVision] Worker initialized (Singleton)");
   }
-  return globalWorker;
+  return globalWorker as Worker;
 }
 
 export const useAiVision = () => {
@@ -160,7 +160,7 @@ export const useAiVision = () => {
           const cleanHint = hintText.toLowerCase().trim();
           const scoredItems = ITEMS.map((item: any) => {
             const cands = [item.name.toLowerCase(), ...(item.aliases || []).map((a: string) => a.toLowerCase())];
-            const dist = Math.min(...candidates.map((c: string) => levenshteinDistance(cleanHint, c)));
+            const dist = Math.min(...cands.map((c: string) => levenshteinDistance(cleanHint, c)));
             return { name: item.name, dist };
           });
           scoredItems.sort((a: any, b: any) => a.dist - b.dist);

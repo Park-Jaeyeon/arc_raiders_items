@@ -190,7 +190,7 @@ const sliceIntoGrid = (bounds: Rect): Rect[] => {
   return slots;
 };
 
-export const detectInventorySlots = (imageData: ImageData, threshold = 50): Rect[] => {
+export const detectInventorySlots = (imageData: ImageData, _threshold = 50): Rect[] => {
   // threshold 파라미터는 이제 무시하고 내부적으로 다중 threshold 사용
   const bounds = findBestBounds(imageData);
   return sliceIntoGrid(bounds);
