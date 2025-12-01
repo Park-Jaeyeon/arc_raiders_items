@@ -50,6 +50,16 @@ npm run dev
 
 브라우저에서 `http://localhost:5173` (또는 터미널에 표시된 주소)으로 접속하여 애플리케이션을 사용할 수 있습니다.
 
+### 배포 (GitHub Pages)
+
+프로젝트를 GitHub Pages에 배포하려면 다음 명령어를 사용하세요:
+
+```bash
+npm run deploy
+```
+
+배포된 애플리케이션은 [https://ashkite.github.io/arc_raiders_items/](https://ashkite.github.io/arc_raiders_items/) 에서 확인할 수 있습니다.
+
 ## 사용 방법
 
 1.  **이미지 업로드**: 인벤토리 스크린샷을 드래그 앤 드롭하거나 클릭하여 업로드합니다.
