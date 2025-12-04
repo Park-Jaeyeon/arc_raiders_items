@@ -47,7 +47,13 @@ const blobToDataURL = (blob: Blob): Promise<string> => {
 
 // --- Worker Singleton ---
 let globalWorker: Worker | null = null;
+const INIT_MESSAGE_ID = 'init-sequence';
 const workerPendingPromises = new Map<string, (result: any) => void>();
+
+const resolveAllPending = (value: any) => {
+  workerPendingPromises.forEach((resolver) => resolver(value));
+  workerPendingPromises.clear();
+};
 
 function getWorker(): Worker {
   if (!globalWorker) {
@@ -61,6 +67,9 @@ function getWorker(): Worker {
         colno: error.colno,
         error: error.error
       });
+
+      // 모든 대기 중인 요청을 실패로 마무리하여 호출 측이 응답을 기다리지 않도록 함
+      resolveAllPending(null);
     };
 
   // Update worker message handler to handle 'results' property
@@ -92,14 +101,45 @@ function getWorker(): Worker {
   return globalWorker as Worker;
 }
 
+type ReadyState = 'idle' | 'loading' | 'ready' | 'error';
+
 export const useAiVision = () => {
-  const [isReady, setIsReady] = useState(false);
+  const [readyState, setReadyState] = useState<ReadyState>('idle');
+  const [readyError, setReadyError] = useState<string | null>(null);
 
   useEffect(() => {
     const w = getWorker();
-    // Pre-load model immediately
-    w.postMessage({ type: 'init', id: 'init-sequence' });
-    setIsReady(true);
+    setReadyState('loading');
+    setReadyError(null);
+
+    const handleError = (e: ErrorEvent) => {
+      console.error('[AiVision] Worker crashed before ready', e.error || e.message);
+      setReadyState('error');
+      setReadyError(e.message || 'Worker crashed during initialization');
+    };
+
+    const handleReady = (e: MessageEvent) => {
+      if (e.data?.id !== INIT_MESSAGE_ID) return;
+
+      if (e.data?.status === 'ready') {
+        setReadyState('ready');
+      }
+      if (e.data?.status === 'error') {
+        console.error('[AiVision] Worker failed to initialize', e.data.error);
+        setReadyState('error');
+        setReadyError(e.data.error || 'Unknown initialization error');
+      }
+    };
+
+    // Listen for worker readiness (separate from RPC responses)
+    w.addEventListener('error', handleError);
+    w.addEventListener('message', handleReady);
+    w.postMessage({ type: 'init', id: INIT_MESSAGE_ID });
+
+    return () => {
+      w.removeEventListener('error', handleError);
+      w.removeEventListener('message', handleReady);
+    };
   }, []);
 
   const analyzeBatch = useCallback(async (
@@ -210,5 +250,5 @@ export const useAiVision = () => {
     return results;
   }, []);
 
-  return { analyzeBatch, isReady };
+  return { analyzeBatch, isReady: readyState === 'ready', readyState, readyError };
 };
